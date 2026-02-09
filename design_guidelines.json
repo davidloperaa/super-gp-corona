@@ -1,0 +1,128 @@
+{
+  "identity": {
+    "name": "E1: The Anti-AI Designer",
+    "tone": "Adrenaline, Aggressive, Futuristic, High-Contrast",
+    "core_principles": [
+      "Fusion over Imitation: Racing meets Cyberpunk",
+      "Emotion First: Speed and Danger",
+      "Content is King: Action shots drive the narrative",
+      "Contrast: Neon on Asphalt"
+    ]
+  },
+  "theme": {
+    "mode": "dark",
+    "base_style": "Midnight Asphalt",
+    "background_hex": "#050505",
+    "foreground_hex": "#EDEDED"
+  },
+  "typography": {
+    "font_family_headings": "Oxanium, sans-serif",
+    "font_family_body": "Space Grotesk, sans-serif",
+    "instructions": "Install '@fontsource/oxanium' and '@fontsource/space-grotesk'. Use Oxanium for all H1-H3 headers. Use Space Grotesk for body text and data tables.",
+    "scale": {
+      "h1": "text-6xl md:text-8xl font-black uppercase tracking-tighter",
+      "h2": "text-4xl md:text-5xl font-bold uppercase tracking-tight",
+      "h3": "text-2xl md:text-3xl font-semibold uppercase",
+      "body": "text-base md:text-lg font-normal leading-relaxed"
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": "#FF0000",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#00CED1",
+      "secondary_foreground": "#000000",
+      "accent": "#E6007E",
+      "accent_foreground": "#FFFFFF",
+      "warning": "#FFDA00",
+      "background": "#050505",
+      "surface": "#121212",
+      "border": "#333333"
+    },
+    "gradients": {
+      "hero_overlay": "linear-gradient(180deg, rgba(5,5,5,0) 0%, rgba(5,5,5,1) 100%)",
+      "neon_red": "linear-gradient(45deg, #FF0000, #FF4D4D)",
+      "neon_cyan": "linear-gradient(45deg, #00CED1, #00FFFF)"
+    },
+    "utility_classes": {
+      "text_glow": "drop-shadow-[0_0_10px_rgba(255,0,0,0.8)]",
+      "border_glow": "shadow-[0_0_15px_rgba(0,206,209,0.5)]"
+    }
+  },
+  "visual_enhancers": {
+    "textures": [
+      "Carbon fiber patterns for backgrounds",
+      "Noise overlays (opacity 0.05) to reduce digital flatness"
+    ],
+    "shapes": [
+      "Skewed containers (-skew-x-6) for 'Speed' effect",
+      "Sharp angles, no rounded corners (rounded-none)"
+    ],
+    "motion": {
+      "hover": "transform skew-x-12 transition-all duration-300",
+      "entrance": "staggered fade-in-up"
+    }
+  },
+  "layout_strategy": {
+    "grid_system": "Bento Grid (Tetris Mode)",
+    "container_width": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "spacing": "Generous (py-24 for sections)",
+    "rules": [
+      "Never center text by default (except Hero)",
+      "Use 'Tetris' grid for category display",
+      "Mobile-first stacking"
+    ]
+  },
+  "components": {
+    "button": {
+      "style": "bg-primary text-primary-foreground font-black uppercase tracking-wider skew-x-[-10deg] hover:skew-x-0 transition-transform px-8 py-4 rounded-none border-2 border-transparent hover:border-white",
+      "data_testid": "action-button"
+    },
+    "card": {
+      "style": "bg-surface border border-white/10 hover:border-primary/50 transition-colors p-6 backdrop-blur-md relative overflow-hidden group",
+      "enhancement": "Add a 'racing stripe' div on the left edge that glows on hover"
+    },
+    "input": {
+      "style": "bg-black/50 border-white/20 focus:border-primary text-white rounded-none h-12",
+      "data_testid": "form-input"
+    },
+    "section_hero": {
+      "description": "Full height, video/image background, massive typography.",
+      "layout": "Overlay text bottom-left or center. High contrast."
+    },
+    "section_registration": {
+      "description": "Multi-step wizard. Step 1: Personal Info. Step 2: Categories. Step 3: Payment.",
+      "style": "Clean, focused, no distractions. Progress bar visible."
+    }
+  },
+  "assets": {
+    "image_urls": {
+      "hero_main": "https://images.unsplash.com/photo-1760979191911-70a8c01ed015?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHw0fHxtb3RvY3Jvc3MlMjBqdW1wJTIwZGlydCUyMHRyYWNrJTIwYWN0aW9ufGVufDB8fHx8MTc3MDY3MDQ2Mnww&ixlib=rb-4.1.0&q=85",
+      "hero_secondary": "https://images.unsplash.com/photo-1746690818493-128cb32d23a9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHwxfHxtb3RvY3Jvc3MlMjBqdW1wJTIwZGlydCUyMHRyYWNrJTIwYWN0aW9ufGVufDB8fHx8MTc3MDY3MDQ2Mnww&ixlib=rb-4.1.0&q=85",
+      "karting": "https://images.unsplash.com/photo-1752348511598-e30c96fb7cd2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHxnbyUyMGthcnQlMjByYWNpbmclMjB0cmFjayUyMGFjdGlvbnxlbnwwfHx8fDE3NzA2NzA0NjN8MA&ixlib=rb-4.1.0&q=85",
+      "karting_action": "https://images.unsplash.com/photo-1752348622936-d81ed3d3152b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwzfHxnbyUyMGthcnQlMjByYWNpbmclMjB0cmFjayUyMGFjdGlvbnxlbnwwfHx8fDE3NzA2NzA0NjN8MA&ixlib=rb-4.1.0&q=85",
+      "podium_kid": "https://images.unsplash.com/photo-1752435200915-4f16168c6e89?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzF8MHwxfHNlYXJjaHwyfHxtb3RvY3Jvc3MlMjByYWNlJTIwd2lubmVyJTIwdHJvcGh5JTIwcG9kaXVtfGVufDB8fHx8MTc3MDY3MDQ3NHww&ixlib=rb-4.1.0&q=85",
+      "crowd": "https://images.unsplash.com/photo-1752778312055-3b7798f167b1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwxfHxtb3RvY3Jvc3MlMjBjcm93ZCUyMGNoZWVyaW5nJTIwZmFuc3xlbnwwfHx8fDE3NzA2NzA0NjV8MA&ixlib=rb-4.1.0&q=85"
+    },
+    "icons": {
+      "library": "lucide-react",
+      "preferred": ["Trophy", "Flag", "Flame", "Timer", "Calendar", "MapPin", "Ticket", "UserPlus"]
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. INSTALL FONTS: Run `npm install @fontsource/oxanium @fontsource/space-grotesk` or import them in index.css.",
+    "2. CONFIGURE TAILWIND: Update `tailwind.config.js` with the Midnight Asphalt palette and custom font families.",
+    "3. SETUP SHADCN: Customize basic components (Button, Input, Card) to match the 'Anti-AI' racer aesthetic (skewed, sharp edges).",
+    "4. BUILD LAYOUT: Create the pages defined in the prompt (Home, About, Categories, Registration, etc.) using the Tetris Grid.",
+    "5. FORM LOGIC: Implement the multi-step registration form with strict validation for the 32 categories.",
+    "6. USE IMAGES: Use the provided Unsplash URLs for placeholders. DO NOT use generic placeholders."
+  ],
+  "universal_guidelines": [
+    "Don't make generic centered layouts.",
+    "Create depth through layered design elements.",
+    "Every interaction needs micro-animations.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Components MUST use named exports.",
+    "All interactive elements MUST include `data-testid`."
+  ]
+}
