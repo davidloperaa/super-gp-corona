@@ -64,6 +64,7 @@ class RegistrationCreate(BaseModel):
     numero_competicion: str = Field(..., min_length=1)
     celular: str = Field(..., min_length=10)
     correo: EmailStr
+    liga: Optional[str] = None
     categorias: List[str] = Field(..., min_items=1)
     codigo_cupon: Optional[str] = None
 
