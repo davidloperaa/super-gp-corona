@@ -84,6 +84,9 @@ class Registration(BaseModel):
     estado_pago: str = "pendiente"
     mercadopago_payment_id: Optional[str] = None
     mercadopago_preference_id: Optional[str] = None
+    qr_code: Optional[str] = None
+    check_in: bool = False
+    check_in_time: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Coupon(BaseModel):
