@@ -133,6 +133,30 @@ export const AdminDashboard = () => {
             </h2>
             <p className="text-white/70">Crear y gestionar noticias del evento</p>
           </Link>
+
+          <Link
+            to="/admin/precios"
+            data-testid="link-gestionar-precios"
+            className="bg-surface border-2 border-white/10 p-8 hover:border-warning transition-colors group"
+          >
+            <DollarSign className="w-12 h-12 text-warning mb-4" />
+            <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-warning transition-colors">
+              Gestionar Precios
+            </h2>
+            <p className="text-white/70">Actualizar precios de categorías</p>
+          </Link>
+
+          <Link
+            to="/admin/contenido"
+            data-testid="link-gestionar-contenido"
+            className="bg-surface border-2 border-white/10 p-8 hover:border-secondary transition-colors group"
+          >
+            <Newspaper className="w-12 h-12 text-secondary mb-4" />
+            <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-secondary transition-colors">
+              Gestionar Contenido
+            </h2>
+            <p className="text-white/70">Editar textos y contenido del sitio</p>
+          </Link>
         </div>
       </div>
     </div>
