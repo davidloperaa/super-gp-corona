@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Settings, Save, Palette, Image, Calendar, Link as LinkIcon } from 'lucide-react';
+import { useSettings } from '../../context/SettingsContext';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export const AdminConfiguracion = () => {
   const navigate = useNavigate();
+  const { settings: contextSettings, refreshSettings } = useSettings();
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -18,19 +20,9 @@ export const AdminConfiguracion = () => {
       navigate('/admin/login');
       return;
     }
-    fetchSettings();
-  }, [navigate]);
-
-  const fetchSettings = async () => {
-    try {
-      const response = await axios.get(`${API}/settings`);
-      setSettings(response.data.settings || {});
-    } catch (error) {
-      console.error('Error fetching settings:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setSettings(contextSettings);
+    setLoading(false);
+  }, [navigate, contextSettings]);
 
   const handleChange = (key, value) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -44,7 +36,11 @@ export const AdminConfiguracion = () => {
       await axios.put(`${API}/admin/settings`, settings, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert('¡Configuración guardada exitosamente!');
+      
+      // Refrescar el contexto para aplicar cambios inmediatamente
+      refreshSettings();
+      
+      alert('¡Configuración guardada exitosamente! Los cambios se aplicarán en toda la página.');
     } catch (error) {
       alert('Error al guardar configuración');
     } finally {
