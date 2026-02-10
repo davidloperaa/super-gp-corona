@@ -1,14 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Trophy, Flag, Timer, MapPin, Flame } from 'lucide-react';
+import { useSettings } from '../context/SettingsContext';
 
 export const Home = () => {
+  const { settings, loading } = useSettings();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <section
         className="relative h-screen flex items-end pb-20"
         style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1760979191911-70a8c01ed015?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHw0fHxtb3RvY3Jvc3MlMjBqdW1wJTIwZGlydCUyMHRyYWNrJTIwYWN0aW9ufGVufDB8fHx8MTc3MDY3MDQ2Mnww&ixlib=rb-4.1.0&q=85)',
+          backgroundImage: `url(${settings.hero_image_url})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
@@ -19,24 +30,29 @@ export const Home = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <div className="space-y-6">
             <h1 className="font-heading text-6xl md:text-8xl font-black uppercase tracking-tighter text-glow-red" data-testid="hero-title">
-              CAMPEONATO<br />
-              INTERLIGAS<br />
-              <span className="text-secondary text-glow-cyan">SUPER GP</span>
+              {settings.hero_title.split(' ').map((word, i) => (
+                <React.Fragment key={i}>
+                  {word}
+                  {i < settings.hero_title.split(' ').length - 1 && <br />}
+                </React.Fragment>
+              ))}
+              <br />
+              <span className="text-secondary text-glow-cyan">{settings.hero_subtitle}</span>
             </h1>
             
             <div className="flex items-center space-x-4 text-white">
               <div className="flex items-center space-x-2">
                 <Calendar className="w-6 h-6 text-warning" />
-                <span className="font-heading text-xl font-bold">20 - 21 - 22 FEBRERO 2026</span>
+                <span className="font-heading text-xl font-bold">{settings.event_start_date} - {settings.event_end_date}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="w-6 h-6 text-warning" />
-                <span className="font-heading text-xl font-bold">POPAYÁN, COLOMBIA</span>
+                <span className="font-heading text-xl font-bold">{settings.event_location}</span>
               </div>
             </div>
 
             <p className="text-white/80 text-lg max-w-2xl">
-              Vive la emoción del motociclismo extremo. 32 categorías, 3 días de competencia, adrenalina sin límites.
+              {settings.hero_description}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
