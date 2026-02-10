@@ -352,8 +352,13 @@ async def create_registration(reg: RegistrationCreate):
         estado_pago="pendiente" if precio_final > 0 else "completado"
     )
     
+    qr_code = generate_qr_code(registration.id, JWT_SECRET)
+    registration.qr_code = qr_code
+    
     doc = registration.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
+    if doc.get('check_in_time'):
+        doc['check_in_time'] = doc['check_in_time'].isoformat()
     
     await db.registrations.insert_one(doc)
     
@@ -364,7 +369,7 @@ async def create_registration(reg: RegistrationCreate):
         )
     
     if precio_final == 0:
-        email_html = generate_confirmation_email(doc)
+        email_html = generate_confirmation_email(doc, qr_code)
         send_email(reg.correo, "Confirmación de Inscripción - Super GP Corona XP 2026", email_html, EMAIL_ADMIN)
     
     return registration
