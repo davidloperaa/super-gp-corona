@@ -678,6 +678,21 @@ async def get_attendance_stats(payload: dict = Depends(verify_token)):
         "checked_in_list": checked_in_list
     }
 
+
+@api_router.post("/admin/resend-email/{registration_id}")
+async def resend_confirmation_email(registration_id: str, payload: dict = Depends(verify_token)):
+    reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    email_html = generate_confirmation_email(reg, reg.get('qr_code'))
+    success = send_email(reg["correo"], "Confirmación de Inscripción - Super GP Corona XP 2026", email_html, EMAIL_ADMIN)
+    
+    if success:
+        return {"message": "Email reenviado exitosamente", "to": reg["correo"]}
+    else:
+        raise HTTPException(status_code=500, detail="Error al enviar email")
+
 @api_router.get("/registration/{registration_id}/qr")
 async def get_registration_qr(registration_id: str):
     reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
