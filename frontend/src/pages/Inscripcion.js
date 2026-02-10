@@ -284,6 +284,19 @@ export const Inscripcion = () => {
                   />
                   {errors.correo && <p className="text-primary text-sm mt-1">{errors.correo}</p>}
                 </div>
+
+                <div>
+                  <label className="block text-sm font-heading font-bold mb-2">Liga a la que está afiliado</label>
+                  <input
+                    type="text"
+                    name="liga"
+                    data-testid="input-liga"
+                    value={formData.liga}
+                    onChange={handleInputChange}
+                    placeholder="Ej: Liga del Cauca"
+                    className="w-full bg-black/50 border border-white/20 focus:border-primary text-white h-12 px-4 outline-none"
+                  />
+                </div>
               </div>
             </div>
           )}
