@@ -1,5 +1,6 @@
 import '@/index.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { SettingsProvider } from './context/SettingsContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Home } from './pages/Home';
