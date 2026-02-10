@@ -181,7 +181,17 @@ def send_email(to: str, subject: str, html: str, cc: Optional[str] = None):
         logging.error(f"Error sending email: {str(e)}")
         return False
 
-def generate_confirmation_email(registration: dict) -> str:
+def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
+    qr_section = ""
+    if qr_code:
+        qr_section = f"""
+        <div style="text-align: center; margin: 30px 0; padding: 20px; background: white; border: 3px dashed #00CED1;">
+            <h3 style="color: #000; margin-bottom: 15px;">Tu Código QR de Acceso</h3>
+            <img src="{qr_code}" alt="QR Code" style="max-width: 250px; height: auto;" />
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">Presenta este QR el día del evento para tu check-in</p>
+        </div>
+        """
+    
     return f"""
     <!DOCTYPE html>
     <html>
@@ -208,6 +218,8 @@ def generate_confirmation_email(registration: dict) -> str:
                 <p>Estimado/a {registration['nombre']} {registration['apellido']},</p>
                 <p>Tu inscripción ha sido confirmada exitosamente para el Campeonato Interligas Super GP Corona XP 2026.</p>
                 
+                {qr_section}
+                
                 <h3 style="color: #00CED1;">Detalles de tu inscripción:</h3>
                 <div class="info-row">
                     <span class="label">ID de Inscripción:</span> {registration['id']}
@@ -232,6 +244,10 @@ def generate_confirmation_email(registration: dict) -> str:
                 <h3 style="color: #00CED1;">Información del Evento:</h3>
                 <p><strong>📅 Fechas:</strong> 20, 21 y 22 de Febrero 2026</p>
                 <p><strong>📍 Ubicación:</strong> Corona Club XP, Avenida Panamericana Km 9 El Cofre, Popayán</p>
+                
+                <div style="background: #FF0000; padding: 15px; margin: 20px 0; border-radius: 5px;">
+                    <p style="margin: 0; color: white; font-weight: bold;">⚠️ IMPORTANTE: Lleva tu QR code impreso o en tu celular el día del evento</p>
+                </div>
                 
                 <p style="margin-top: 30px;">Para cualquier consulta, contáctanos en <a href="mailto:inscripciones@coronaclubxp.com" style="color: #00CED1;">inscripciones@coronaclubxp.com</a></p>
                 
