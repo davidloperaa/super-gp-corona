@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+motor
+pydantic
+pydantic-settings
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
+python-multipart
+mercadopago
+requests
+qrcode[pil]
+pillow
+python-dotenv
