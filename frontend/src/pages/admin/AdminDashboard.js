@@ -157,6 +157,30 @@ export const AdminDashboard = () => {
             </h2>
             <p className="text-white/70">Editar textos y contenido del sitio</p>
           </Link>
+
+          <Link
+            to="/admin/configuracion"
+            data-testid="link-configuracion"
+            className="bg-surface border-2 border-white/10 p-8 hover:border-accent transition-colors group"
+          >
+            <Newspaper className="w-12 h-12 text-accent mb-4" />
+            <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-accent transition-colors">
+              Configuraci\u00f3n General
+            </h2>
+            <p className="text-white/70">Logo, colores, fechas, hero, footer</p>
+          </Link>
+
+          <Link
+            to="/admin/asistencia"
+            data-testid="link-asistencia"
+            className="bg-surface border-2 border-white/10 p-8 hover:border-warning transition-colors group"
+          >
+            <Users className="w-12 h-12 text-warning mb-4" />
+            <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-warning transition-colors">
+              Control de Asistencia
+            </h2>
+            <p className="text-white/70">Escanear QR y check-in del evento</p>
+          </Link>
         </div>
       </div>
     </div>
