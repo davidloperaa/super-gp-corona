@@ -1,0 +1,7 @@
+{
+  "name": "corona-xp-2026-backend",
+  "version": "2.0.0",
+  "scripts": {
+    "start": "uvicorn server:app --host 0.0.0.0 --port 8001"
+  }
+}
