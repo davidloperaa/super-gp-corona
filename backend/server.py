@@ -346,6 +346,7 @@ async def create_registration(reg: RegistrationCreate):
         numero_competicion=reg.numero_competicion,
         celular=reg.celular,
         correo=reg.correo,
+        liga=reg.liga,
         categorias=reg.categorias,
         precio_base=precio_base,
         descuento=descuento,
