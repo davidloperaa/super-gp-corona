@@ -23,10 +23,11 @@ import { AdminAsistencia } from './pages/admin/AdminAsistencia';
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
+    <SettingsProvider>
+      <div className="App">
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/categorias" element={<Categorias />} />
           <Route path="/calendario" element={<Calendario />} />
