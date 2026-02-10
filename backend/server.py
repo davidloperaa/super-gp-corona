@@ -595,6 +595,103 @@ async def admin_register(credentials: AdminCreate):
     await db.admins.insert_one(admin_doc)
     return {"message": "Admin creado exitosamente"}
 
+@api_router.get("/settings")
+async def get_settings():
+    settings = await db.site_settings.find_one({"_id": "settings"}, {"_id": 0})
+    if not settings:
+        default_settings = SiteSettings().model_dump()
+        return {"settings": default_settings}
+    return {"settings": settings}
+
+@api_router.put("/admin/settings")
+async def update_settings(settings: SiteSettings, payload: dict = Depends(verify_token)):
+    settings_dict = settings.model_dump()
+    settings_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.site_settings.update_one(
+        {"_id": "settings"},
+        {"$set": settings_dict},
+        upsert=True
+    )
+    return {"message": "Configuración actualizada", "settings": settings_dict}
+
+@api_router.post("/qr/scan")
+async def scan_qr(request: QRScanRequest):
+    is_valid, registration_id = verify_qr_code(request.qr_data, JWT_SECRET)
+    
+    if not is_valid:
+        raise HTTPException(status_code=400, detail="Código QR inválido")
+    
+    reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    return {
+        "valid": True,
+        "registration": reg,
+        "can_check_in": not reg.get("check_in", False) and reg.get("estado_pago") == "completado"
+    }
+
+@api_router.post("/admin/check-in")
+async def check_in_registration(request: CheckInRequest, payload: dict = Depends(verify_token)):
+    reg = await db.registrations.find_one({"id": request.registration_id})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    if reg.get("check_in"):
+        raise HTTPException(status_code=400, detail="Este piloto ya hizo check-in")
+    
+    if reg.get("estado_pago") != "completado":
+        raise HTTPException(status_code=400, detail="El pago no está completado")
+    
+    await db.registrations.update_one(
+        {"id": request.registration_id},
+        {
+            "$set": {
+                "check_in": True,
+                "check_in_time": datetime.now(timezone.utc).isoformat()
+            }
+        }
+    )
+    
+    return {"message": "Check-in exitoso", "registration_id": request.registration_id}
+
+@api_router.get("/admin/attendance")
+async def get_attendance_stats(payload: dict = Depends(verify_token)):
+    total_registrations = await db.registrations.count_documents({})
+    completed_payments = await db.registrations.count_documents({"estado_pago": "completado"})
+    checked_in = await db.registrations.count_documents({"check_in": True})
+    
+    checked_in_list = await db.registrations.find(
+        {"check_in": True},
+        {"_id": 0, "nombre": 1, "apellido": 1, "numero_competicion": 1, "check_in_time": 1, "categorias": 1}
+    ).to_list(1000)
+    
+    return {
+        "total_registrations": total_registrations,
+        "completed_payments": completed_payments,
+        "checked_in": checked_in,
+        "attendance_rate": (checked_in / completed_payments * 100) if completed_payments > 0 else 0,
+        "checked_in_list": checked_in_list
+    }
+
+@api_router.get("/registration/{registration_id}/qr")
+async def get_registration_qr(registration_id: str):
+    reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    if not reg.get("qr_code"):
+        qr_code = generate_qr_code(registration_id, JWT_SECRET)
+        await db.registrations.update_one(
+            {"id": registration_id},
+            {"$set": {"qr_code": qr_code}}
+        )
+        return {"qr_code": qr_code}
+    
+    return {"qr_code": reg["qr_code"]}
+
+
 app.include_router(api_router)
 
 app.add_middleware(
