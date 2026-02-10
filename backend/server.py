@@ -458,7 +458,7 @@ async def mercadopago_webhook(request: Request):
                         }
                     )
                     
-                    email_html = generate_confirmation_email(reg)
+                    email_html = generate_confirmation_email(reg, reg.get('qr_code'))
                     send_email(reg["correo"], "Confirmación de Inscripción - Super GP Corona XP 2026", email_html, EMAIL_ADMIN)
         
         return {"status": "ok"}
