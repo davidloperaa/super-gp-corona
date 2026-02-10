@@ -3,27 +3,26 @@ import { Calendar, Clock, MapPin, Flag } from 'lucide-react';
 
 const eventos = [
   {
-    dia: 'Jueves 20',
+    dia: 'Viernes 20',
     fecha: '20 de Febrero 2026',
     actividades: [
-      { hora: '08:00 - 12:00', titulo: 'Aguapanelazo', descripcion: 'Recepción y acreditación de pilotos' },
-      { hora: '13:00 - 18:00', titulo: 'Entrenamientos', descripcion: 'Sesión de entrenamientos libres todas las categorías' },
+      { hora: '19:00', titulo: 'Aguapanelazo', descripcion: 'Recepción y acreditación de pilotos' },
     ],
   },
   {
-    dia: 'Viernes 21',
+    dia: 'Sábado 21',
     fecha: '21 de Febrero 2026',
     actividades: [
-      { hora: '08:00 - 12:00', titulo: 'Entrenamientos Reconocimientos 2025', descripcion: 'Sesión clasificatoria para todas las categorías' },
-      { hora: '13:00 - 18:00', titulo: 'Carreras Clasificatorias', descripcion: 'Primera ronda de carreras clasificatorias' },
+      { hora: '09:00 - 18:00', titulo: 'Entrenamientos', descripcion: 'Sesión de entrenamientos libres todas las categorías' },
+      { hora: '19:00', titulo: 'Reconocimiento y Premiación 2025', descripcion: 'Reconocimiento y premiación Pilotos campeones y subcampeones Campeonato Super GP Corona Club XP 2025' },
     ],
   },
   {
-    dia: 'Sábado 22',
+    dia: 'Domingo 22',
     fecha: '22 de Febrero 2026',
     actividades: [
-      { hora: '08:00 - 14:00', titulo: 'CARRERAS FINALES', descripcion: 'Carreras finales - Todas las categorías' },
-      { hora: '15:00 - 17:00', titulo: 'Premiación', descripcion: 'Ceremonia de premiación y entrega de trofeos' },
+      { hora: '08:00 - 17:00', titulo: 'CARRERAS', descripcion: 'Carreras - Todas las categorías' },
+      { hora: '18:00', titulo: 'Premiación', descripcion: 'Ceremonia de premiación y entrega de trofeos' },
     ],
   },
 ];
