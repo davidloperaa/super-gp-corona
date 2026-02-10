@@ -17,6 +17,8 @@ import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminNews } from './pages/admin/AdminNews';
 import { AdminPrecios } from './pages/admin/AdminPrecios';
 import { AdminContenido } from './pages/admin/AdminContenido';
+import { AdminConfiguracion } from './pages/admin/AdminConfiguracion';
+import { AdminAsistencia } from './pages/admin/AdminAsistencia';
 
 function App() {
   return (
