@@ -140,8 +140,18 @@ export const Inscripcion = () => {
         codigo_cupon: codigoCupon || null,
       });
 
-      alert(`¡Inscripción exitosa! ID: ${response.data.id}. Precio final: COP ${response.data.precio_final.toLocaleString()}`);
-      navigate('/');
+      const registration = response.data;
+      
+      if (registration.precio_final === 0) {
+        alert(`¡Inscripción completada! Cupón 100% aplicado. Recibirás confirmación por email.`);
+        navigate('/pago-exitoso?registration_id=' + registration.id);
+      } else {
+        const paymentResponse = await axios.post(`${API}/payments/create-preference`, {
+          registration_id: registration.id
+        });
+        
+        window.location.href = paymentResponse.data.init_point;
+      }
     } catch (error) {
       alert(error.response?.data?.detail || 'Error al procesar inscripción');
     } finally {
