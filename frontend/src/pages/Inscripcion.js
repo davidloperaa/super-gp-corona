@@ -25,6 +25,7 @@ export const Inscripcion = () => {
     numero_competicion: '',
     celular: '',
     correo: '',
+    liga: '',
     categorias: [],
   });
 
