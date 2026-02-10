@@ -77,6 +77,7 @@ class Registration(BaseModel):
     numero_competicion: str
     celular: str
     correo: EmailStr
+    liga: Optional[str] = None
     categorias: List[str]
     precio_base: float
     descuento: float = 0.0
