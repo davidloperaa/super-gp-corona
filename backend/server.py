@@ -15,6 +15,9 @@ import jwt
 from decimal import Decimal
 import mercadopago
 import requests
+import hashlib
+from qr_service import generate_qr_code, verify_qr_code
+from models import SiteSettings, SettingsUpdate, QRScanRequest, CheckInRequest
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
