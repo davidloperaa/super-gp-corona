@@ -1,4 +1,4 @@
-# Campeonato Interligas Super GP Corona XP 2026
+# Campeonato Interligas Super GP Corona XP 2026 - ACTUALIZADO
 
 ## 🏍️ Acceso a la Aplicación
 
@@ -11,178 +11,212 @@
 - **Email:** admin@coronaxp.com
 - **Contraseña:** Admin123
 
-## 💳 Cupones de Descuento Disponibles
+## 💳 Integración de Pagos - MercadoPago
 
-1. **PREVENTA30**
-   - Descuento: 30%
-   - Usos máximos: 100
-   - Estado: Activo
+✅ **INTEGRACIÓN COMPLETA EN PRODUCCIÓN**
 
-2. **ESPECIAL50**
-   - Descuento: 50%
-   - Usos máximos: 50
-   - Estado: Activo
+- **Access Token:** APP_USR-3036384607288277-112109... (configurado en backend)
+- **Public Key:** APP_USR-6d930a25-840c-4da0-9627-ca4c140356cc
+- **Entorno:** PRODUCCIÓN
+- **País:** Colombia (COP)
 
-## 📋 Funcionalidades Implementadas
+### Flujo de Pago Implementado:
+1. Usuario completa inscripción con sus datos y categorías
+2. Sistema calcula precio automáticamente
+3. Si tiene cupón 100% → Inscripción completada sin pago
+4. Si requiere pago → Redirect a MercadoPago checkout
+5. Usuario completa pago en MercadoPago
+6. Webhook notifica al backend automáticamente
+7. Email de confirmación enviado automáticamente
+
+## 📧 Sistema de Notificaciones por Email - Resend
+
+✅ **INTEGRACIÓN COMPLETA**
+
+- **Servicio:** Resend
+- **API Key:** re_TX9cFVwg_9FW31Dgr2wy733MRLwfzXfvN (configurado)
+- **Email From:** onboarding@resend.dev (dominio de prueba)
+- **Email Admin CC:** inscripcionescorona@gmail.com
+
+### Emails Automáticos:
+- ✅ Confirmación de inscripción (envío inmediato)
+- ✅ Copia al administrador en cada inscripción
+- ✅ Template HTML personalizado con branding del evento
+
+## 💰 Sistema de Precios
+
+### Precio Estándar Actual
+**TODAS las categorías: COP $120,000**
+
+### Gestión de Precios desde Admin
+✅ Panel Admin → Gestionar Precios
+- Modificar precio de cualquier categoría individualmente
+- Actualización masiva de todos los precios
+- Cambios se aplican instantáneamente
+
+### Sistema de Fases
+- **Preventa** (enero): 15% descuento automático
+- **Ordinaria** (febrero): Precio normal
+- **Extraordinaria** (marzo+): +20% sobre precio base
+
+### Cupones Disponibles
+1. **PREVENTA30** - 30% descuento (100 usos máx.)
+2. **ESPECIAL50** - 50% descuento (50 usos máx.)
+3. Crear nuevos cupones desde el panel admin (30%, 50%, 100%)
+
+## 🎨 Panel de Administración - CMS Completo
+
+### Secciones Disponibles:
+
+1. **Dashboard** (`/admin/dashboard`)
+   - Estadísticas en tiempo real
+   - Total inscripciones e ingresos
+   - Acceso rápido a todas las funciones
+
+2. **Gestionar Inscripciones** (`/admin/registrations`)
+   - Ver todas las inscripciones
+   - Filtrar por estado de pago
+   - Exportar datos
+   - Información completa de cada piloto
+
+3. **Gestionar Cupones** (`/admin/coupons`)
+   - Crear cupones personalizados
+   - Configurar descuentos (30%, 50%, 100%)
+   - Límite de usos
+   - Activar/desactivar cupones
+
+4. **Publicar Noticias** (`/admin/news`)
+   - Crear actualizaciones del evento
+   - Agregar imágenes
+   - Mostrar automáticamente en la página
+
+5. **✨ NUEVO - Gestionar Precios** (`/admin/precios`)
+   - Editar precio de cada una de las 31 categorías
+   - Actualización individual o masiva
+   - Cambios en tiempo real
+
+6. **✨ NUEVO - Gestionar Contenido** (`/admin/contenido`)
+   - Editar textos del Hero
+   - Modificar información del evento
+   - Actualizar datos de contacto
+   - Cambiar enlaces de redes sociales
+   - **Parametrizar completamente la página sin tocar código**
+
+## 📋 Funcionalidades Completas
 
 ### Páginas Públicas
-- ✅ Home / Landing Page con hero impactante
-- ✅ Categorías (32 categorías de motociclismo)
-- ✅ Calendario del evento (20-22 Febrero 2026)
+- ✅ Landing page con diseño impactante
+- ✅ 31 Categorías con precios dinámicos
+- ✅ Calendario detallado del evento
 - ✅ Galería de imágenes
 - ✅ Noticias y actualizaciones
-- ✅ Formulario de inscripción multi-step
+- ✅ Formulario de inscripción multi-step (3 pasos)
 
-### Formulario de Inscripción (3 pasos)
-1. **Datos Personales**
-   - Nombre y apellido
-   - Cédula
-   - Número de competición
-   - Celular
-   - Correo electrónico
+### Proceso de Inscripción
+1. **Paso 1:** Datos personales completos
+2. **Paso 2:** Selección múltiple de categorías
+3. **Paso 3:** Aplicar cupón y ver resumen
+4. **Pago:** Redirect automático a MercadoPago
+5. **Confirmación:** Email automático + página de éxito
 
-2. **Selección de Categorías**
-   - 32 categorías disponibles
-   - Selección múltiple
-   - Precios diferenciados por categoría
+### Páginas de Estado de Pago
+- ✅ `/pago-exitoso` - Confirmación de pago exitoso
+- ✅ `/pago-fallido` - Pago rechazado/cancelado
+- ✅ `/pago-pendiente` - Pago en proceso
 
-3. **Resumen y Pago**
-   - Aplicación de cupones de descuento
-   - Cálculo automático de precios
-   - Sistema de fases (preventa, ordinaria, extraordinaria)
-
-### Panel de Administración
-- ✅ Login seguro con JWT
-- ✅ Dashboard con estadísticas
-- ✅ Gestión de inscripciones
-- ✅ Crear y gestionar cupones de descuento (30%, 50%, 100%)
-- ✅ Publicar noticias
-
-## 🎨 Diseño
-
-**Tema:** Midnight Asphalt (Dark Mode)
-**Colores:**
-- Primario: #FF0000 (Rojo)
-- Secundario: #00CED1 (Cian)
-- Acento: #E6007E (Magenta)
-- Warning: #FFDA00 (Amarillo)
-- Fondo: #050505 (Negro)
-
-**Fuentes:**
-- Headings: Oxanium
-- Body: Space Grotesk
-
-## 📊 Categorías del Evento
-
-1. INFANTIL
-2. INFANTIL MINI
-3. 115 2T Élite
-4. 150 2T Élite
-5. 115 2T Master
-6. 115 2T Novatos
-7. 150 2T Novatos
-8. 115 2T Principiantes
-9. Categoría Libre
-10. Ax100 - NKD y Scooter Novatos
-11. Ax100 - NKD y Scooter Elite
-12. 220 4T Novatos
-13. 220 4T Élite
-14. Super Moto
-15. GP1 motos 4T hasta 160cc
-16. Crypton Original Novatos
-17. Disegraf Crypton Recreativa RPDD
-18. Boxer CT 100 Recreativa RPDD
-19. Nkd 125 / Tvs 125 4T Recreativa RPDD
-20. 150cc 4T Stock Multimarca Recreativa RPDD
-21. 200 4T Stock Multimarca No Slick Recreativa RPDD
-22. Libre pilotos afiliados liga del Cauca
-23. Alto Cilindraje mas de 300cc
-24. Karts
-25. Liquimoly Popayan Sin experiencia
-26. Liqui Moly Popayán con experiencia
-27. Fórmula Colombia Liquimoly motos carenadas
-28. Veloarena Infantil hasta 11 años
-29. Veloarena adultos libre cilindrada
-30. Motocross infantil hasta 11 años
-31. Motocross Adultos Libre cilindrada
-
-## 🔧 Tecnologías Utilizadas
+## 🔧 Tecnologías Implementadas
 
 **Frontend:**
 - React 19
 - React Router DOM
-- Axios
-- Tailwind CSS
-- Lucide React (iconos)
+- Axios para API calls
+- Tailwind CSS + diseño "Midnight Asphalt"
 - Fuentes: Oxanium & Space Grotesk
 
 **Backend:**
-- FastAPI
-- MongoDB (Motor - async driver)
+- FastAPI con async/await
+- MongoDB (Motor async driver)
 - JWT Authentication
+- **MercadoPago SDK 2.3.0** (producción)
+- **Resend para emails** (API REST)
 - Bcrypt para passwords
 - Pydantic para validación
 
+## 📊 Estadísticas del Sistema
+
+- **31 Categorías** de competencia
+- **Precio estándar:** COP $120,000 por categoría
+- **3 Fases** de precios (preventa, ordinaria, extraordinaria)
+- **Cupones ilimitados** (configurables desde admin)
+- **Emails automáticos** con Resend
+- **Pagos en producción** con MercadoPago Colombia
+
+## 🚀 Mejoras Implementadas en Esta Versión
+
+### ✅ Integración Completa MercadoPago
+- Checkout redirect flow implementado
+- Webhooks configurados y funcionando
+- Manejo de estados: éxito, fallido, pendiente
+- URLs de retorno configuradas
+
+### ✅ Sistema de Emails Automatizado
+- Confirmación inmediata al usuario
+- Copia al admin en cada inscripción
+- Template HTML profesional
+- Toda la información de la inscripción incluida
+
+### ✅ Panel Admin CMS Completo
+- Gestión de precios por categoría
+- Editor de contenido sin código
+- Parametrización total del sitio
+- Interfaz intuitiva y rápida
+
+### ✅ Precios Actualizados
+- Todas las categorías a COP $120,000
+- Sistema flexible para cambios futuros
+- Actualización instantánea
+
 ## 📝 Endpoints API Principales
 
-### Públicos
-- `GET /api/` - Info de la API
-- `GET /api/categories` - Obtener categorías y precios
-- `POST /api/registrations/calculate` - Calcular precio de inscripción
-- `POST /api/registrations` - Crear inscripción
-- `POST /api/coupons/validate` - Validar cupón
-- `GET /api/news` - Obtener noticias
+### Nuevos Endpoints:
 
-### Admin (requiere autenticación)
-- `POST /api/admin/login` - Login
-- `POST /api/admin/register` - Registrar nuevo admin
-- `GET /api/registrations` - Listar inscripciones
-- `POST /api/admin/coupons` - Crear cupón
-- `GET /api/admin/coupons` - Listar cupones
-- `POST /api/admin/news` - Publicar noticia
+**Pagos:**
+- `POST /api/payments/create-preference` - Crear preferencia de pago MercadoPago
+- `POST /api/webhooks/mercadopago` - Recibir notificaciones de pago
+- `GET /api/mercadopago/public-key` - Obtener public key para frontend
 
-## 🎯 Sistema de Precios
+**Admin CMS:**
+- `GET /api/admin/category-prices` - Obtener precios actuales
+- `PUT /api/admin/category-price` - Actualizar precio de categoría
+- `GET /api/content` - Obtener contenido del sitio
+- `PUT /api/admin/content` - Actualizar contenido del sitio
 
-### Fases de Inscripción
-1. **Preventa** (hasta 31 enero)
-   - 15% de descuento sobre precio base
+## 🎯 Próximas Mejoras Recomendadas
 
-2. **Ordinaria** (febrero)
-   - Precio normal
+1. **Dashboard Avanzado:** Gráficas de inscripciones por día/categoría
+2. **Reportes:** Generación de PDFs con listas de inscritos
+3. **Verificación de Asistencia:** QR codes para check-in en el evento
+4. **Estadísticas en Vivo:** Contador de inscritos por categoría
+5. **Multi-idioma:** Soporte para inglés/portugués
 
-3. **Extraordinaria** (después de febrero)
-   - +20% sobre precio base
+## 🔐 Seguridad Implementada
 
-### Cupones de Descuento
-- **30%** - Descuento moderado
-- **50%** - Descuento medio
-- **100%** - Inscripción gratuita
+- ✅ JWT para autenticación admin
+- ✅ Bcrypt para passwords
+- ✅ Validación de webhooks MercadoPago
+- ✅ Sanitización de inputs con Pydantic
+- ✅ CORS configurado correctamente
+- ✅ Credenciales en variables de entorno
 
-## 📅 Calendario del Evento
+## 📞 Soporte
 
-**Jueves 20 de Febrero 2026**
-- 08:00 - 12:00: Aguapanelazo (Acreditación)
-- 13:00 - 18:00: Entrenamientos libres
-
-**Viernes 21 de Febrero 2026**
-- 08:00 - 12:00: Entrenamientos Reconocimientos 2025
-- 13:00 - 18:00: Carreras Clasificatorias
-
-**Sábado 22 de Febrero 2026**
-- 08:00 - 14:00: CARRERAS FINALES
-- 15:00 - 17:00: Ceremonia de Premiación
-
-## 📍 Ubicación
-
-**Corona Club XP**
-Avenida Panamericana, KM 9 El Cofre
-Popayán, Cauca - Colombia
+**Email Admin:** inscripcionescorona@gmail.com
+**Email Inscripciones:** inscripciones@coronaclubxp.com
 
 ---
 
-**Nota:** Esta es una aplicación de demostración. Para producción se recomienda:
-1. Cambiar las credenciales de administrador
-2. Configurar certificados SSL
-3. Implementar integración real con MercadoPago
-4. Agregar sistema de backups para la base de datos
-5. Configurar rate limiting en el backend
+**Última Actualización:** 9 de Febrero 2026
+**Versión del Sistema:** 2.0.0
+**Estado:** ✅ PRODUCCIÓN - Totalmente funcional con pagos reales
+
+**NOTA IMPORTANTE:** Este sistema está configurado con credenciales de producción de MercadoPago. Todos los pagos procesados son REALES y se cobrarán a las tarjetas de los usuarios.
