@@ -1,7 +1,7 @@
 # Campeonato Interligas Super GP Corona XP 2026 - PRD
 
 ## Descripción del Proyecto
-Sitio web moderno, dinámico y responsive para el evento de motociclismo "Campeonato Interligas Super GP Corona XP 2026".
+Sitio web moderno, dinámico y responsive para el evento de motociclismo "Campeonato Interligas Super GP Corona XP 2026". Plataforma multi-tenant diseñada para comercializar eventos similares.
 
 ## Requisitos Core
 
@@ -35,10 +35,17 @@ Sitio web moderno, dinámico y responsive para el evento de motociclismo "Campeo
 - [x] Gestión de cupones de descuento
 - [x] Edición de contenido (títulos, descripciones, fechas, footer, header)
 - [x] Gestión de precios por categoría
-- [ ] **PENDIENTE**: Subida de imagen para logo personalizado
-- [ ] **PENDIENTE**: Gestión de galería de imágenes
+- [x] **COMPLETADO**: Subida de imagen para logo personalizado
+- [x] **COMPLETADO**: Sistema de gestión de galería de imágenes
 - [ ] **PENDIENTE**: Editor WYSIWYG para textos largos
 - [ ] **PENDIENTE**: Vista previa en tiempo real de cambios
+
+### Sistema de Comisiones (NUEVO - 13 Feb 2026)
+- [x] Panel de Super Admin separado del admin de eventos
+- [x] Configuración de comisiones por porcentaje o monto fijo
+- [x] Cálculo automático de comisiones en cada inscripción
+- [x] Estadísticas de comisiones totales
+- [x] Gestión de credenciales MercadoPago por evento
 
 ### Notificaciones
 - [x] Emails de confirmación automáticos via Resend
@@ -60,14 +67,16 @@ Sitio web moderno, dinámico y responsive para el evento de motociclismo "Campeo
 - FastAPI (Python)
 - MongoDB (base de datos)
 - Pydantic (validación de datos)
+- Upload de imágenes local (/uploads)
 
 ### Frontend
 - React.js
 - Tailwind CSS
 - React Router DOM
+- React Quill (WYSIWYG - instalado)
 
 ### Integraciones
-- MercadoPago (pagos)
+- MercadoPago (pagos) - Configuración dinámica por evento
 - Resend (emails transaccionales)
 - QR Code generation (qrcode library)
 
@@ -75,13 +84,20 @@ Sitio web moderno, dinámico y responsive para el evento de motociclismo "Campeo
 
 ### Completado (13 Feb 2026)
 - Actualización de fechas del evento a 27, 28 Feb y 1 Mar 2026
-- Fechas actualizadas en: Home, Calendario, email template, base de datos
+- Panel de Super Admin completo con:
+  - Login separado (/superadmin/login)
+  - Dashboard con estadísticas de comisiones
+  - Configuración de comisiones (porcentaje/fijo)
+  - Gestión de credenciales MercadoPago del evento
+  - Vista de todos los registros con detalles de comisión
+- Sistema de upload de imágenes:
+  - Logo del evento
+  - Imagen Hero
+  - Gestión de galería con drag & drop y reordenamiento
 
 ### Tareas Pendientes
 
 #### P0 - Alta Prioridad
-- [ ] Implementar subida de imagen para logo
-- [ ] Sistema de gestión de galería de imágenes
 - [ ] Editor WYSIWYG para campos de texto largo
 - [ ] Vista previa en tiempo real en admin panel
 
@@ -92,9 +108,10 @@ Sitio web moderno, dinámico y responsive para el evento de motociclismo "Campeo
 - [ ] Finalizar guía de deployment (Vercel vs Hostinger)
 
 ## Credenciales y Configuración
-Ver `/app/credentials.md` para detalles de acceso admin.
+Ver `/app/credentials.md` para detalles de acceso admin y super admin.
 
 ## Documentos Relacionados
 - `/app/DEPLOYMENT_GUIDE.md`
 - `/app/VERCEL_DEPLOYMENT_GUIDE.md`
 - `/app/RESEND_EMAIL_INFO.md`
+- `/app/credentials.md`
