@@ -470,6 +470,10 @@ async def create_payment_preference(data: dict):
     if reg.get("precio_final", 0) == 0:
         raise HTTPException(status_code=400, detail="Esta inscripción no requiere pago")
     
+    # Get dynamic MercadoPago configuration
+    mp_config = await get_event_mercadopago_config()
+    event_sdk = mercadopago.SDK(mp_config.get("mercadopago_access_token", MERCADOPAGO_ACCESS_TOKEN))
+    
     preference_data = {
         "items": [
             {
@@ -498,7 +502,7 @@ async def create_payment_preference(data: dict):
     }
     
     try:
-        preference_response = sdk.preference().create(preference_data)
+        preference_response = event_sdk.preference().create(preference_data)
         preference = preference_response["response"]
         
         await db.registrations.update_one(
