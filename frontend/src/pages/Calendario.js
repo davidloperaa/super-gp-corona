@@ -3,23 +3,23 @@ import { Calendar, Clock, MapPin, Flag } from 'lucide-react';
 
 const eventos = [
   {
-    dia: 'Viernes 20',
-    fecha: '20 de Febrero 2026',
+    dia: 'Jueves 27',
+    fecha: '27 de Febrero 2026',
     actividades: [
       { hora: '19:00', titulo: 'Aguapanelazo', descripcion: 'Recepción y acreditación de pilotos' },
     ],
   },
   {
-    dia: 'Sábado 21',
-    fecha: '21 de Febrero 2026',
+    dia: 'Viernes 28',
+    fecha: '28 de Febrero 2026',
     actividades: [
       { hora: '09:00 - 18:00', titulo: 'Entrenamientos', descripcion: 'Sesión de entrenamientos libres todas las categorías' },
       { hora: '19:00', titulo: 'Reconocimiento y Premiación 2025', descripcion: 'Reconocimiento y premiación Pilotos campeones y subcampeones Campeonato Super GP Corona Club XP 2025' },
     ],
   },
   {
-    dia: 'Domingo 22',
-    fecha: '22 de Febrero 2026',
+    dia: 'Sábado 1',
+    fecha: '1 de Marzo 2026',
     actividades: [
       { hora: '08:00 - 17:00', titulo: 'CARRERAS', descripcion: 'Carreras - Todas las categorías' },
       { hora: '18:00', titulo: 'Premiación', descripcion: 'Ceremonia de premiación y entrega de trofeos' },
