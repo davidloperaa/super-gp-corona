@@ -156,6 +156,9 @@ class Registration(BaseModel):
     precio_base: float
     descuento: float = 0.0
     precio_final: float
+    # Commission tracking
+    comision_plataforma: float = 0.0
+    neto_evento: float = 0.0
     codigo_cupon: Optional[str] = None
     estado_pago: str = "pendiente"
     mercadopago_payment_id: Optional[str] = None
