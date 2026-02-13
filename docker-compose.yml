@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-CoronaXP2026DB}
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - coronaxp-network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - MONGO_URL=mongodb://admin:${MONGO_PASSWORD:-CoronaXP2026DB}@mongodb:27017
+      - DB_NAME=coronaxp_db
+      - JWT_SECRET=${JWT_SECRET:-super-secret-jwt-key-change-in-production}
+      - SUPER_ADMIN_SECRET=${SUPER_ADMIN_SECRET:-platform-super-secret-2026}
+      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
+      - MERCADOPAGO_PUBLIC_KEY=${MERCADOPAGO_PUBLIC_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - EMAIL_FROM=${EMAIL_FROM:-inscripciones@tudominio.com}
+      - EMAIL_ADMIN=${EMAIL_ADMIN:-admin@gmail.com}
+      - FRONTEND_URL=${FRONTEND_URL:-https://tudominio.com}
+    volumes:
+      - uploads_data:/app/uploads
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+    networks:
+      - coronaxp-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_BACKEND_URL=${FRONTEND_URL:-https://tudominio.com}
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - coronaxp-network
+
+volumes:
+  mongodb_data:
+  uploads_data:
+
+networks:
+  coronaxp-network:
+    driver: bridge
