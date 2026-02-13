@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Save, Palette, Image, Calendar, Link as LinkIcon } from 'lucide-react';
+import { Settings, Save, Palette, Image, Calendar, Link as LinkIcon, Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -13,6 +13,10 @@ export const AdminConfiguracion = () => {
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState({ logo: false, hero: false });
+  const [message, setMessage] = useState({ type: '', text: '' });
+  const logoInputRef = useRef(null);
+  const heroInputRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -28,8 +32,44 @@ export const AdminConfiguracion = () => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
+  const handleImageUpload = async (e, type) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading((prev) => ({ ...prev, [type]: true }));
+    const token = localStorage.getItem('admin_token');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('image_type', type);
+
+      const response = await axios.post(`${API}/admin/upload-image`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      const imageKey = type === 'logo' ? 'logo_url' : 'hero_image_url';
+      handleChange(imageKey, response.data.url);
+      setMessage({ type: 'success', text: `Imagen de ${type} subida exitosamente` });
+    } catch (error) {
+      setMessage({ type: 'error', text: `Error al subir imagen: ${error.response?.data?.detail || error.message}` });
+    } finally {
+      setUploading((prev) => ({ ...prev, [type]: false }));
+    }
+  };
+
+  const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${BACKEND_URL}${url}`;
+  };
+
   const handleSaveAll = async () => {
     setSaving(true);
+    setMessage({ type: '', text: '' });
     const token = localStorage.getItem('admin_token');
 
     try {
@@ -37,12 +77,10 @@ export const AdminConfiguracion = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       
-      // Refrescar el contexto para aplicar cambios inmediatamente
       refreshSettings();
-      
-      alert('¡Configuración guardada exitosamente! Los cambios se aplicarán en toda la página.');
+      setMessage({ type: 'success', text: '¡Configuración guardada exitosamente!' });
     } catch (error) {
-      alert('Error al guardar configuración');
+      setMessage({ type: 'error', text: 'Error al guardar configuración' });
     } finally {
       setSaving(false);
     }
@@ -59,21 +97,136 @@ export const AdminConfiguracion = () => {
   return (
     <div className="min-h-screen pt-32 pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="font-heading text-5xl font-black uppercase text-glow-red">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="font-heading text-4xl md:text-5xl font-black uppercase text-glow-red">
             CONFIGURACIÓN GENERAL
           </h1>
           <button
             onClick={handleSaveAll}
             disabled={saving}
             className="flex items-center space-x-2 bg-secondary text-black font-heading font-bold uppercase px-6 py-3 hover:bg-secondary/80 transition-colors disabled:opacity-50"
+            data-testid="save-all-btn"
           >
             <Save className="w-5 h-5" />
             <span>{saving ? 'Guardando...' : 'Guardar Todo'}</span>
           </button>
         </div>
 
+        {message.text && (
+          <div className={`mb-6 p-4 rounded-lg flex items-center space-x-3 ${
+            message.type === 'success' 
+              ? 'bg-green-500/20 border border-green-500/50 text-green-300'
+              : 'bg-red-500/20 border border-red-500/50 text-red-300'
+          }`}>
+            {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
+            <span>{message.text}</span>
+          </div>
+        )}
+
         <div className="space-y-8">
+          {/* Logo & Hero Images */}
+          <div className="bg-surface border border-white/10 p-6">
+            <div className="flex items-center space-x-3 mb-6">
+              <Image className="w-6 h-6 text-primary" />
+              <h2 className="font-heading text-2xl font-bold uppercase">Imágenes del Sitio</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Logo Upload */}
+              <div>
+                <label className="block text-sm font-heading font-bold mb-3">Logo del Evento</label>
+                <div 
+                  className="relative border-2 border-dashed border-white/20 rounded-lg p-4 hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={() => logoInputRef.current?.click()}
+                >
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, 'logo')}
+                    className="hidden"
+                    data-testid="logo-upload"
+                  />
+                  
+                  {uploading.logo ? (
+                    <div className="flex items-center justify-center h-32">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                    </div>
+                  ) : settings.logo_url ? (
+                    <div className="relative">
+                      <img 
+                        src={getImageUrl(settings.logo_url)} 
+                        alt="Logo" 
+                        className="h-32 mx-auto object-contain"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleChange('logo_url', null);
+                        }}
+                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-32 text-white/50">
+                      <Upload className="w-8 h-8 mb-2" />
+                      <span className="text-sm">Subir Logo</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Hero Image Upload */}
+              <div>
+                <label className="block text-sm font-heading font-bold mb-3">Imagen Hero (Fondo Principal)</label>
+                <div 
+                  className="relative border-2 border-dashed border-white/20 rounded-lg p-4 hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={() => heroInputRef.current?.click()}
+                >
+                  <input
+                    ref={heroInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, 'hero')}
+                    className="hidden"
+                    data-testid="hero-upload"
+                  />
+                  
+                  {uploading.hero ? (
+                    <div className="flex items-center justify-center h-32">
+                      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                    </div>
+                  ) : settings.hero_image_url ? (
+                    <div className="relative">
+                      <img 
+                        src={getImageUrl(settings.hero_image_url)} 
+                        alt="Hero" 
+                        className="h-32 w-full object-cover rounded"
+                      />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleChange('hero_image_url', null);
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-32 text-white/50">
+                      <Upload className="w-8 h-8 mb-2" />
+                      <span className="text-sm">Subir Imagen Hero</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Colors */}
           <div className="bg-surface border border-white/10 p-6">
             <div className="flex items-center space-x-3 mb-6">
               <Palette className="w-6 h-6 text-secondary" />
@@ -154,6 +307,7 @@ export const AdminConfiguracion = () => {
             </div>
           </div>
 
+          {/* Hero Section */}
           <div className="bg-surface border border-white/10 p-6">
             <h2 className="font-heading text-2xl font-bold uppercase mb-6">Hero Section</h2>
             <div className="space-y-4">
@@ -187,6 +341,7 @@ export const AdminConfiguracion = () => {
             </div>
           </div>
 
+          {/* Event Dates */}
           <div className="bg-surface border border-white/10 p-6">
             <div className="flex items-center space-x-3 mb-6">
               <Calendar className="w-6 h-6 text-warning" />
@@ -199,7 +354,7 @@ export const AdminConfiguracion = () => {
                   type="text"
                   value={settings.event_start_date || ''}
                   onChange={(e) => handleChange('event_start_date', e.target.value)}
-                  placeholder="20 de Febrero 2026"
+                  placeholder="27 de Febrero 2026"
                   className="w-full bg-black/50 border border-white/20 focus:border-primary text-white h-12 px-4 outline-none"
                 />
               </div>
@@ -209,7 +364,7 @@ export const AdminConfiguracion = () => {
                   type="text"
                   value={settings.event_end_date || ''}
                   onChange={(e) => handleChange('event_end_date', e.target.value)}
-                  placeholder="22 de Febrero 2026"
+                  placeholder="1 de Marzo 2026"
                   className="w-full bg-black/50 border border-white/20 focus:border-primary text-white h-12 px-4 outline-none"
                 />
               </div>
@@ -225,6 +380,7 @@ export const AdminConfiguracion = () => {
             </div>
           </div>
 
+          {/* Footer */}
           <div className="bg-surface border border-white/10 p-6">
             <h2 className="font-heading text-2xl font-bold uppercase mb-6">Footer</h2>
             <div className="space-y-4">
@@ -273,6 +429,7 @@ export const AdminConfiguracion = () => {
             onClick={handleSaveAll}
             disabled={saving}
             className="w-full bg-primary text-white font-heading font-black uppercase px-8 py-4 hover:bg-primary/80 transition-colors disabled:opacity-50"
+            data-testid="save-bottom-btn"
           >
             {saving ? 'Guardando...' : 'Guardar Toda la Configuración'}
           </button>
