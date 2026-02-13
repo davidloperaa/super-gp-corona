@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, Request, UploadFile, File, Form
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -16,8 +17,15 @@ from decimal import Decimal
 import mercadopago
 import requests
 import hashlib
+import base64
+import shutil
 from qr_service import generate_qr_code, verify_qr_code
-from models import SiteSettings, SettingsUpdate, QRScanRequest, CheckInRequest
+from models import (
+    SiteSettings, SettingsUpdate, QRScanRequest, CheckInRequest,
+    PlatformConfig, PlatformConfigUpdate, EventMercadoPagoConfig, 
+    EventMercadoPagoUpdate, SuperAdminLogin, SuperAdminCreate, 
+    GalleryImage, CommissionType
+)
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
