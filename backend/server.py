@@ -387,7 +387,9 @@ async def root():
 
 @api_router.get("/mercadopago/public-key")
 async def get_mercadopago_public_key():
-    return {"public_key": MERCADOPAGO_PUBLIC_KEY}
+    """Get the event's MercadoPago public key"""
+    mp_config = await get_event_mercadopago_config()
+    return {"public_key": mp_config.get("mercadopago_public_key", MERCADOPAGO_PUBLIC_KEY)}
 
 @api_router.get("/categories")
 async def get_categories():
