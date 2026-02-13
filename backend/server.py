@@ -30,6 +30,10 @@ from models import (
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+# Create uploads directory
+UPLOADS_DIR = ROOT_DIR / "uploads"
+UPLOADS_DIR.mkdir(exist_ok=True)
+
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
@@ -38,8 +42,12 @@ app = FastAPI(title="Super GP Corona XP 2026 API")
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
 
+# Mount static files for uploads
+app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
+
 JWT_SECRET = os.getenv('JWT_SECRET', 'super-secret-key-change-in-production')
 JWT_ALGORITHM = 'HS256'
+SUPER_ADMIN_SECRET = os.getenv('SUPER_ADMIN_SECRET', 'platform-super-secret-2026')
 MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN')
 MERCADOPAGO_PUBLIC_KEY = os.getenv('MERCADOPAGO_PUBLIC_KEY')
 RESEND_API_KEY = os.getenv('RESEND_API_KEY')
