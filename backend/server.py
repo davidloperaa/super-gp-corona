@@ -787,6 +787,305 @@ async def get_registration_qr(registration_id: str):
     return {"qr_code": reg["qr_code"]}
 
 
+# ==================== SUPER ADMIN ENDPOINTS ====================
+
+@api_router.post("/superadmin/login")
+async def super_admin_login(credentials: SuperAdminLogin):
+    """Login for Super Admin (Platform Owner)"""
+    admin = await db.super_admins.find_one({"email": credentials.email}, {"_id": 0})
+    
+    if not admin:
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
+    
+    if not bcrypt.checkpw(credentials.password.encode(), admin["password_hash"].encode()):
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
+    
+    token = create_access_token({"email": admin["email"], "role": "super_admin"})
+    return {"access_token": token, "token_type": "bearer", "role": "super_admin"}
+
+@api_router.post("/superadmin/register")
+async def super_admin_register(credentials: SuperAdminCreate):
+    """Create a new Super Admin - requires secret key"""
+    if credentials.secret_key != SUPER_ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Clave secreta inválida")
+    
+    existing = await db.super_admins.find_one({"email": credentials.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Super Admin ya existe")
+    
+    password_hash = bcrypt.hashpw(credentials.password.encode(), bcrypt.gensalt()).decode()
+    
+    admin_doc = {
+        "id": str(uuid.uuid4()),
+        "email": credentials.email,
+        "password_hash": password_hash,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.super_admins.insert_one(admin_doc)
+    return {"message": "Super Admin creado exitosamente"}
+
+@api_router.get("/superadmin/platform-config")
+async def get_platform_config_endpoint(payload: dict = Depends(verify_super_admin_token)):
+    """Get platform configuration (Super Admin only)"""
+    config = await get_platform_config()
+    # Mask sensitive data
+    if config.get("mercadopago_access_token"):
+        config["mercadopago_access_token_masked"] = "****" + config["mercadopago_access_token"][-4:]
+        del config["mercadopago_access_token"]
+    return {"config": config}
+
+@api_router.put("/superadmin/platform-config")
+async def update_platform_config(update: PlatformConfigUpdate, payload: dict = Depends(verify_super_admin_token)):
+    """Update platform configuration (Super Admin only)"""
+    update_dict = {k: v for k, v in update.model_dump().items() if v is not None}
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.platform_config.update_one(
+        {"_id": "config"},
+        {"$set": update_dict},
+        upsert=True
+    )
+    return {"message": "Configuración de plataforma actualizada"}
+
+@api_router.get("/superadmin/event-mercadopago")
+async def get_event_mp_config(payload: dict = Depends(verify_super_admin_token)):
+    """Get event's MercadoPago configuration (Super Admin only)"""
+    config = await get_event_mercadopago_config()
+    # Mask sensitive data
+    if config.get("mercadopago_access_token"):
+        config["mercadopago_access_token_masked"] = "****" + config["mercadopago_access_token"][-4:]
+        del config["mercadopago_access_token"]
+    return {"config": config}
+
+@api_router.put("/superadmin/event-mercadopago")
+async def update_event_mp_config(update: EventMercadoPagoUpdate, payload: dict = Depends(verify_super_admin_token)):
+    """Update event's MercadoPago configuration (Super Admin only)"""
+    update_dict = {k: v for k, v in update.model_dump().items() if v is not None}
+    update_dict["event_id"] = "default"
+    update_dict["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.event_mercadopago.update_one(
+        {"event_id": "default"},
+        {"$set": update_dict},
+        upsert=True
+    )
+    return {"message": "Configuración de MercadoPago del evento actualizada"}
+
+@api_router.get("/superadmin/commission-stats")
+async def get_commission_stats(payload: dict = Depends(verify_super_admin_token)):
+    """Get commission statistics (Super Admin only)"""
+    pipeline = [
+        {"$match": {"estado_pago": "completado"}},
+        {"$group": {
+            "_id": None,
+            "total_registrations": {"$sum": 1},
+            "total_revenue": {"$sum": "$precio_final"},
+            "total_commission": {"$sum": "$comision_plataforma"},
+            "total_net_to_events": {"$sum": "$neto_evento"}
+        }}
+    ]
+    
+    result = await db.registrations.aggregate(pipeline).to_list(1)
+    
+    if result:
+        stats = result[0]
+        del stats["_id"]
+    else:
+        stats = {
+            "total_registrations": 0,
+            "total_revenue": 0,
+            "total_commission": 0,
+            "total_net_to_events": 0
+        }
+    
+    config = await get_platform_config()
+    stats["commission_type"] = config.get("commission_type", "percentage")
+    stats["commission_value"] = config.get("commission_value", 5.0)
+    
+    return {"stats": stats}
+
+@api_router.get("/superadmin/registrations")
+async def get_all_registrations_super(payload: dict = Depends(verify_super_admin_token)):
+    """Get all registrations with commission details (Super Admin only)"""
+    registrations = await db.registrations.find(
+        {},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(1000)
+    
+    return {"registrations": registrations, "total": len(registrations)}
+
+
+# ==================== IMAGE UPLOAD ENDPOINTS ====================
+
+@api_router.post("/admin/upload-image")
+async def upload_image(
+    file: UploadFile = File(...),
+    image_type: str = Form("general"),
+    payload: dict = Depends(verify_token)
+):
+    """Upload an image (logo, hero, gallery)"""
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Tipo de archivo no permitido. Use JPG, PNG, GIF o WebP")
+    
+    # Generate unique filename
+    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    filename = f"{image_type}_{uuid.uuid4()}.{ext}"
+    filepath = UPLOADS_DIR / filename
+    
+    # Save file
+    try:
+        with open(filepath, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al guardar imagen: {str(e)}")
+    
+    # Return URL
+    image_url = f"/uploads/{filename}"
+    return {"url": image_url, "filename": filename, "type": image_type}
+
+@api_router.delete("/admin/delete-image/{filename}")
+async def delete_image(filename: str, payload: dict = Depends(verify_token)):
+    """Delete an uploaded image"""
+    filepath = UPLOADS_DIR / filename
+    
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="Imagen no encontrada")
+    
+    try:
+        filepath.unlink()
+        return {"message": "Imagen eliminada", "filename": filename}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al eliminar imagen: {str(e)}")
+
+
+# ==================== GALLERY MANAGEMENT ENDPOINTS ====================
+
+@api_router.get("/gallery")
+async def get_gallery():
+    """Get all gallery images"""
+    settings = await db.site_settings.find_one({"_id": "settings"}, {"_id": 0})
+    gallery = settings.get("gallery_images", []) if settings else []
+    return {"images": gallery}
+
+@api_router.post("/admin/gallery")
+async def add_gallery_image(
+    file: UploadFile = File(...),
+    title: str = Form(None),
+    payload: dict = Depends(verify_token)
+):
+    """Add an image to the gallery"""
+    # Validate file type
+    allowed_types = ["image/jpeg", "image/png", "image/gif", "image/webp"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Tipo de archivo no permitido")
+    
+    # Generate unique filename
+    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    filename = f"gallery_{uuid.uuid4()}.{ext}"
+    filepath = UPLOADS_DIR / filename
+    
+    # Save file
+    try:
+        with open(filepath, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al guardar imagen: {str(e)}")
+    
+    # Create gallery image object
+    image_url = f"/uploads/{filename}"
+    
+    # Get current gallery count for order
+    settings = await db.site_settings.find_one({"_id": "settings"})
+    current_gallery = settings.get("gallery_images", []) if settings else []
+    order = len(current_gallery)
+    
+    new_image = {
+        "id": str(uuid.uuid4()),
+        "url": image_url,
+        "title": title,
+        "order": order,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Add to gallery
+    await db.site_settings.update_one(
+        {"_id": "settings"},
+        {"$push": {"gallery_images": new_image}},
+        upsert=True
+    )
+    
+    return {"message": "Imagen agregada a la galería", "image": new_image}
+
+@api_router.delete("/admin/gallery/{image_id}")
+async def delete_gallery_image(image_id: str, payload: dict = Depends(verify_token)):
+    """Remove an image from the gallery"""
+    settings = await db.site_settings.find_one({"_id": "settings"})
+    if not settings:
+        raise HTTPException(status_code=404, detail="Configuración no encontrada")
+    
+    gallery = settings.get("gallery_images", [])
+    image_to_delete = None
+    
+    for img in gallery:
+        if img.get("id") == image_id:
+            image_to_delete = img
+            break
+    
+    if not image_to_delete:
+        raise HTTPException(status_code=404, detail="Imagen no encontrada")
+    
+    # Delete file if it's a local upload
+    if image_to_delete.get("url", "").startswith("/uploads/"):
+        filename = image_to_delete["url"].split("/")[-1]
+        filepath = UPLOADS_DIR / filename
+        if filepath.exists():
+            filepath.unlink()
+    
+    # Remove from gallery
+    await db.site_settings.update_one(
+        {"_id": "settings"},
+        {"$pull": {"gallery_images": {"id": image_id}}}
+    )
+    
+    return {"message": "Imagen eliminada de la galería"}
+
+@api_router.put("/admin/gallery/reorder")
+async def reorder_gallery(order: List[str], payload: dict = Depends(verify_token)):
+    """Reorder gallery images"""
+    settings = await db.site_settings.find_one({"_id": "settings"})
+    if not settings:
+        raise HTTPException(status_code=404, detail="Configuración no encontrada")
+    
+    gallery = settings.get("gallery_images", [])
+    
+    # Create a map of id to image
+    image_map = {img["id"]: img for img in gallery}
+    
+    # Reorder
+    new_gallery = []
+    for idx, image_id in enumerate(order):
+        if image_id in image_map:
+            img = image_map[image_id]
+            img["order"] = idx
+            new_gallery.append(img)
+    
+    # Add any images not in the order list at the end
+    for img in gallery:
+        if img["id"] not in order:
+            img["order"] = len(new_gallery)
+            new_gallery.append(img)
+    
+    await db.site_settings.update_one(
+        {"_id": "settings"},
+        {"$set": {"gallery_images": new_gallery}}
+    )
+    
+    return {"message": "Galería reordenada", "gallery": new_gallery}
+
+
 app.include_router(api_router)
 
 app.add_middleware(
