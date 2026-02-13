@@ -20,6 +20,13 @@ import { AdminPrecios } from './pages/admin/AdminPrecios';
 import { AdminContenido } from './pages/admin/AdminContenido';
 import { AdminConfiguracion } from './pages/admin/AdminConfiguracion';
 import { AdminAsistencia } from './pages/admin/AdminAsistencia';
+import { AdminGaleria } from './pages/admin/AdminGaleria';
+// Super Admin pages
+import { SuperAdminLogin } from './pages/superadmin/SuperAdminLogin';
+import { SuperAdminDashboard } from './pages/superadmin/SuperAdminDashboard';
+import { SuperAdminConfig } from './pages/superadmin/SuperAdminConfig';
+import { SuperAdminMercadoPago } from './pages/superadmin/SuperAdminMercadoPago';
+import { SuperAdminRegistrations } from './pages/superadmin/SuperAdminRegistrations';
 
 function App() {
   return (
@@ -38,6 +45,7 @@ function App() {
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
           <Route path="/pago-fallido" element={<PagoFallido />} />
           
+          {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/registrations" element={<AdminRegistrations />} />
@@ -47,6 +55,14 @@ function App() {
           <Route path="/admin/contenido" element={<AdminContenido />} />
           <Route path="/admin/configuracion" element={<AdminConfiguracion />} />
           <Route path="/admin/asistencia" element={<AdminAsistencia />} />
+          <Route path="/admin/galeria" element={<AdminGaleria />} />
+          
+          {/* Super Admin Routes */}
+          <Route path="/superadmin/login" element={<SuperAdminLogin />} />
+          <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
+          <Route path="/superadmin/config" element={<SuperAdminConfig />} />
+          <Route path="/superadmin/mercadopago" element={<SuperAdminMercadoPago />} />
+          <Route path="/superadmin/registrations" element={<SuperAdminRegistrations />} />
         </Routes>
         <Footer />
       </BrowserRouter>
