@@ -163,11 +163,23 @@ export const AdminDashboard = () => {
             data-testid="link-configuracion"
             className="bg-surface border-2 border-white/10 p-8 hover:border-accent transition-colors group"
           >
-            <Newspaper className="w-12 h-12 text-accent mb-4" />
+            <Settings className="w-12 h-12 text-accent mb-4" />
             <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-accent transition-colors">
-              Configuraci\u00f3n General
+              Configuración General
             </h2>
             <p className="text-white/70">Logo, colores, fechas, hero, footer</p>
+          </Link>
+
+          <Link
+            to="/admin/galeria"
+            data-testid="link-galeria"
+            className="bg-surface border-2 border-white/10 p-8 hover:border-primary transition-colors group"
+          >
+            <Image className="w-12 h-12 text-primary mb-4" />
+            <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-primary transition-colors">
+              Gestionar Galería
+            </h2>
+            <p className="text-white/70">Subir y organizar imágenes del evento</p>
           </Link>
 
           <Link
