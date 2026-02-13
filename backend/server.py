@@ -416,6 +416,9 @@ async def calculate_registration_price(data: dict):
 async def create_registration(reg: RegistrationCreate):
     precio_base, descuento, precio_final, fase, tipo_desc = await calculate_precio(reg.categorias, reg.codigo_cupon)
     
+    # Calculate commission
+    comision, neto_evento = await calculate_commission(precio_final)
+    
     registration = Registration(
         nombre=reg.nombre,
         apellido=reg.apellido,
@@ -428,6 +431,8 @@ async def create_registration(reg: RegistrationCreate):
         precio_base=precio_base,
         descuento=descuento,
         precio_final=precio_final,
+        comision_plataforma=comision,
+        neto_evento=neto_evento,
         codigo_cupon=reg.codigo_cupon,
         estado_pago="pendiente" if precio_final > 0 else "completado"
     )
