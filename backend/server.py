@@ -57,6 +57,64 @@ FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
 sdk = mercadopago.SDK(MERCADOPAGO_ACCESS_TOKEN)
 
+# Helper functions for dynamic MercadoPago and Commission
+async def get_event_mercadopago_config():
+    """Get the event organizer's MercadoPago configuration"""
+    config = await db.event_mercadopago.find_one({"event_id": "default"}, {"_id": 0})
+    if config and config.get("mercadopago_access_token"):
+        return config
+    # Fallback to environment variables
+    return {
+        "mercadopago_access_token": MERCADOPAGO_ACCESS_TOKEN,
+        "mercadopago_public_key": MERCADOPAGO_PUBLIC_KEY,
+        "business_name": "Corona Club XP"
+    }
+
+async def get_platform_config():
+    """Get the platform (super admin) configuration"""
+    config = await db.platform_config.find_one({"_id": "config"}, {"_id": 0})
+    if config:
+        return config
+    # Default config
+    return {
+        "commission_type": "percentage",
+        "commission_value": 5.0,
+        "mercadopago_access_token": MERCADOPAGO_ACCESS_TOKEN,
+        "mercadopago_public_key": MERCADOPAGO_PUBLIC_KEY
+    }
+
+async def calculate_commission(base_amount: float) -> tuple:
+    """Calculate platform commission based on configuration
+    Returns: (commission_amount, net_to_event)
+    """
+    config = await get_platform_config()
+    commission_type = config.get("commission_type", "percentage")
+    commission_value = config.get("commission_value", 5.0)
+    
+    if commission_type == "percentage":
+        commission = base_amount * (commission_value / 100)
+    else:  # fixed
+        commission = commission_value
+    
+    # Ensure commission doesn't exceed the payment
+    commission = min(commission, base_amount)
+    net_to_event = base_amount - commission
+    
+    return round(commission, 0), round(net_to_event, 0)
+
+def verify_super_admin_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Verify super admin JWT token"""
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        if payload.get("role") != "super_admin":
+            raise HTTPException(status_code=403, detail="Acceso solo para Super Admin")
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expirado")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
 CATEGORIAS = [
     "INFANTIL", "INFANTIL MINI", "115 2T Élite", "150 2T Élite", "115 2T Master",
     "115 2T Novatos", "150 2T Novatos", "115 2T Principiantes", "Categoría Libre",
