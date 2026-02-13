@@ -2,11 +2,11 @@
 
 ## 🏍️ Acceso a la Aplicación
 
-**URL Pública:** https://moto-racing-event.preview.emergentagent.com
+**URL Pública:** https://coronaxp-build.preview.emergentagent.com
 
 ## 🔐 Credenciales de Administrador
 
-**Panel Admin:** https://moto-racing-event.preview.emergentagent.com/admin/login
+**Panel Admin:** https://coronaxp-build.preview.emergentagent.com/admin/login
 
 - **Email:** admin@coronaxp.com
 - **Contraseña:** Admin123
