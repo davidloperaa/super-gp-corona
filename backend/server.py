@@ -244,7 +244,7 @@ def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
                 </div>
                 
                 <h3 style="color: #00CED1;">Información del Evento:</h3>
-                <p><strong>📅 Fechas:</strong> 20, 21 y 22 de Febrero 2026</p>
+                <p><strong>📅 Fechas:</strong> 27, 28 de Febrero y 1 de Marzo 2026</p>
                 <p><strong>📍 Ubicación:</strong> Corona Club XP, Avenida Panamericana Km 9 El Cofre, Popayán</p>
                 
                 <div style="background: #FF0000; padding: 15px; margin: 20px 0; border-radius: 5px;">
