@@ -404,25 +404,39 @@ export const AdminRegistrations = () => {
                       {formatDate(reg.created_at)}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      {updatingStatus === reg.id ? (
-                        <RefreshCw className="w-4 h-4 animate-spin mx-auto text-white/50" />
-                      ) : reg.estado_pago === 'pendiente' ? (
-                        <button
-                          onClick={() => handleUpdateStatus(reg.id, 'completado')}
-                          className="p-1 bg-secondary/20 text-secondary hover:bg-secondary/30 transition-colors"
-                          title="Marcar como completado"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleUpdateStatus(reg.id, 'pendiente')}
-                          className="p-1 bg-warning/20 text-warning hover:bg-warning/30 transition-colors"
-                          title="Marcar como pendiente"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </button>
-                      )}
+                      <div className="flex items-center justify-center space-x-2">
+                        {updatingStatus === reg.id ? (
+                          <RefreshCw className="w-4 h-4 animate-spin text-white/50" />
+                        ) : reg.estado_pago === 'pendiente' ? (
+                          <button
+                            onClick={() => handleUpdateStatus(reg.id, 'completado')}
+                            className="p-1 bg-secondary/20 text-secondary hover:bg-secondary/30 transition-colors"
+                            title="Marcar como completado"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleUpdateStatus(reg.id, 'pendiente')}
+                            className="p-1 bg-warning/20 text-warning hover:bg-warning/30 transition-colors"
+                            title="Marcar como pendiente"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </button>
+                        )}
+                        {deletingId === reg.id ? (
+                          <RefreshCw className="w-4 h-4 animate-spin text-red-500" />
+                        ) : (
+                          <button
+                            onClick={() => handleDeleteRegistration(reg.id, `${reg.nombre} ${reg.apellido}`)}
+                            className="p-1 bg-red-500/20 text-red-500 hover:bg-red-500/30 transition-colors"
+                            title="Eliminar inscripción"
+                            data-testid={`btn-delete-${reg.id}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
