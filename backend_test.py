@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 
 class CoronaXPAPITester:
-    def __init__(self, base_url="https://racing-championship-2.preview.emergentagent.com"):
+    def __init__(self, base_url="https://moto-race-2026.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.admin_token = None

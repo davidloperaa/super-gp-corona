@@ -2,11 +2,11 @@
 
 ## 🏍️ Acceso a la Aplicación
 
-**URL Pública:** https://racing-championship-2.preview.emergentagent.com
+**URL Pública:** https://moto-race-2026.preview.emergentagent.com
 
 ## 🔐 Credenciales de Administrador
 
-**Panel Admin:** https://racing-championship-2.preview.emergentagent.com/admin/login
+**Panel Admin:** https://moto-race-2026.preview.emergentagent.com/admin/login
 
 - **Email:** admin@coronaxp.com
 - **Contraseña:** Admin123
