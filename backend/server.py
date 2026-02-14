@@ -250,13 +250,17 @@ async def update_category_price(categoria: str, precio: float):
 
 def send_email(to: str, subject: str, html: str, cc: Optional[str] = None):
     try:
+        if not RESEND_API_KEY:
+            logging.error("RESEND_API_KEY not configured")
+            return False
+            
         headers = {
             "Authorization": f"Bearer {RESEND_API_KEY}",
             "Content-Type": "application/json"
         }
         
         payload = {
-            "from": "onboarding@resend.dev",
+            "from": "Super GP Corona <onboarding@resend.dev>",
             "to": [to],
             "subject": subject,
             "html": html
@@ -265,17 +269,22 @@ def send_email(to: str, subject: str, html: str, cc: Optional[str] = None):
         if cc:
             payload["cc"] = [cc]
         
+        logging.info(f"Sending email to {to} with subject: {subject}")
+        
         response = requests.post(
             "https://api.resend.com/emails",
             json=payload,
             headers=headers
         )
         
-        if response.status_code == 200:
+        logging.info(f"Resend response status: {response.status_code}")
+        logging.info(f"Resend response body: {response.text}")
+        
+        if response.status_code in [200, 201]:
             logging.info(f"Email sent successfully to {to}")
             return True
         else:
-            logging.error(f"Failed to send email: {response.text}")
+            logging.error(f"Failed to send email: {response.status_code} - {response.text}")
             return False
     except Exception as e:
         logging.error(f"Error sending email: {str(e)}")
