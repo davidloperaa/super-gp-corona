@@ -131,3 +131,12 @@ Sitio web moderno y dinámico para un evento de carreras de motocicletas, con si
 - Botón "Vista Previa" en Configuración, Galería y Calendario
 - Nueva página /admin/calendario para gestionar días/actividades/disciplinas
 - Endpoints: GET /api/calendar, PUT /api/admin/calendar
+
+### 2025-02-14 - Actualización de Categorías y Noticias
+- 30 categorías organizadas en 6 grupos: VELOCIDAD TOP, VELOCIDAD, VELOCIDAD RECREATIVAS, KARTS, VELOTIERRA, MOTOCROSS
+- Precios actualizados: $100.000 base (excepto Pilotos LICAMO: $40.000)
+- Grupos almacenados en colección `category_groups`
+- Página de categorías rediseñada para mostrar grupos con colores distintivos
+- Formulario de inscripción organiza categorías por grupos
+- 4 noticias creadas con información de premiación y precios de inscripción
+- Ruta /inscripciones agregada como alias de /inscripcion
