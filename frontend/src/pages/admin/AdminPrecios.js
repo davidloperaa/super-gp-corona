@@ -165,5 +165,6 @@ export const AdminPrecios = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
