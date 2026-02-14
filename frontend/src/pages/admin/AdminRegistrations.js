@@ -77,6 +77,60 @@ export const AdminRegistrations = () => {
     }
   };
 
+  const handleDeleteRegistration = async (registrationId, pilotoNombre) => {
+    if (!window.confirm(`¿Estás seguro de eliminar la inscripción de ${pilotoNombre}? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+    
+    setDeletingId(registrationId);
+    const token = localStorage.getItem('admin_token');
+    
+    try {
+      await axios.delete(
+        `${API}/admin/registrations/${registrationId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setRegistrations(prev => prev.filter(reg => reg.id !== registrationId));
+      alert('Inscripción eliminada exitosamente');
+    } catch (error) {
+      alert('Error al eliminar inscripción');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleDeleteAll = async (type) => {
+    const token = localStorage.getItem('admin_token');
+    
+    try {
+      let url = `${API}/admin/registrations`;
+      let message = '';
+      
+      if (type === 'all') {
+        message = `Se eliminarán TODAS las ${registrations.length} inscripciones`;
+      } else {
+        url = `${API}/admin/registrations/status/${type}`;
+        const count = registrations.filter(r => r.estado_pago === type).length;
+        message = `Se eliminarán ${count} inscripciones con estado "${type}"`;
+      }
+      
+      const response = await axios.delete(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      alert(response.data.message);
+      
+      // Refresh data
+      fetchData(token);
+    } catch (error) {
+      alert('Error al eliminar inscripciones');
+    } finally {
+      setShowDeleteAllModal(false);
+      setDeleteAllType(null);
+    }
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-CO', {
