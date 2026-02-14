@@ -244,6 +244,22 @@ export const AdminRegistrations = () => {
                 <Download className="w-4 h-4" />
                 <span>Exportar x Categoría</span>
               </button>
+              <button
+                onClick={() => { setDeleteAllType('pendiente'); setShowDeleteAllModal(true); }}
+                className="flex items-center space-x-2 bg-warning text-black font-heading font-bold uppercase px-4 py-2 hover:bg-warning/80 transition-colors text-sm"
+                data-testid="btn-eliminar-pendientes"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Eliminar Pendientes</span>
+              </button>
+              <button
+                onClick={() => { setDeleteAllType('all'); setShowDeleteAllModal(true); }}
+                className="flex items-center space-x-2 bg-red-600 text-white font-heading font-bold uppercase px-4 py-2 hover:bg-red-700 transition-colors text-sm"
+                data-testid="btn-eliminar-todo"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Eliminar Todo</span>
+              </button>
             </div>
           </div>
 
