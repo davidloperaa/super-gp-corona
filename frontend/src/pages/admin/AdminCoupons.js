@@ -61,28 +61,30 @@ export const AdminCoupons = () => {
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="font-heading text-5xl font-black uppercase text-glow-red" data-testid="cupones-title">
-            CUPONES
-          </h1>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            data-testid="btn-nuevo-cupon"
-            className="flex items-center space-x-2 bg-primary text-white font-heading font-bold uppercase px-6 py-3 hover:bg-primary/80 transition-colors"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Nuevo Cupón</span>
-          </button>
-        </div>
+    <>
+      <AdminNavbar title="Cupones" />
+      <div className="min-h-screen pt-24 pb-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-12">
+            <h1 className="font-heading text-5xl font-black uppercase text-glow-red" data-testid="cupones-title">
+              CUPONES
+            </h1>
+            <button
+              onClick={() => setShowForm(!showForm)}
+              data-testid="btn-nuevo-cupon"
+              className="flex items-center space-x-2 bg-primary text-white font-heading font-bold uppercase px-6 py-3 hover:bg-primary/80 transition-colors"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Nuevo Cupón</span>
+            </button>
+          </div>
 
-        {showForm && (
-          <form onSubmit={handleSubmit} className="bg-surface border border-white/10 p-8 mb-8" data-testid="form-cupon">
-            <h2 className="font-heading text-2xl font-bold uppercase mb-6">Crear Nuevo Cupón</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-heading font-bold mb-2">Código *</label>
+          {showForm && (
+            <form onSubmit={handleSubmit} className="bg-surface border border-white/10 p-8 mb-8" data-testid="form-cupon">
+              <h2 className="font-heading text-2xl font-bold uppercase mb-6">Crear Nuevo Cupón</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-heading font-bold mb-2">Código *</label>
                 <input
                   type="text"
                   data-testid="input-codigo"
