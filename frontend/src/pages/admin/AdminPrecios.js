@@ -65,17 +65,30 @@ export const AdminPrecios = () => {
   const handleSaveAll = async () => {
     setSaving(true);
     const token = localStorage.getItem('admin_token');
+    let savedCount = 0;
+    let errorCount = 0;
 
     try {
-      const promises = Object.keys(prices).map((categoria) =>
-        axios.put(
-          `${API}/admin/category-price`,
-          { categoria, precio: prices[categoria] },
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
-      );
-      await Promise.all(promises);
-      alert('Todos los precios actualizados exitosamente');
+      // Save prices sequentially to avoid conflicts
+      for (const categoria of Object.keys(prices)) {
+        try {
+          await axios.put(
+            `${API}/admin/category-price`,
+            { categoria, precio: prices[categoria] },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          savedCount++;
+        } catch (err) {
+          console.error(`Error saving ${categoria}:`, err);
+          errorCount++;
+        }
+      }
+      
+      if (errorCount === 0) {
+        alert(`Todos los precios (${savedCount}) actualizados exitosamente`);
+      } else {
+        alert(`Se guardaron ${savedCount} precios. ${errorCount} fallaron.`);
+      }
     } catch (error) {
       alert('Error al actualizar precios');
     } finally {
