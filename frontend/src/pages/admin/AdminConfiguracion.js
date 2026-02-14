@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Settings, Save, Palette, Image, Calendar, Link as LinkIcon, Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Settings, Save, Palette, Image, Calendar, Link as LinkIcon, Upload, X, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
 import { AdminNavbar } from '../../components/AdminNavbar';
 
@@ -104,15 +104,25 @@ export const AdminConfiguracion = () => {
           <h1 className="font-heading text-4xl md:text-5xl font-black uppercase text-glow-red">
             CONFIGURACIÓN GENERAL
           </h1>
-          <button
-            onClick={handleSaveAll}
-            disabled={saving}
-            className="flex items-center space-x-2 bg-secondary text-black font-heading font-bold uppercase px-6 py-3 hover:bg-secondary/80 transition-colors disabled:opacity-50"
-            data-testid="save-all-btn"
-          >
-            <Save className="w-5 h-5" />
-            <span>{saving ? 'Guardando...' : 'Guardar Todo'}</span>
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => window.open('/', '_blank')}
+              className="flex items-center space-x-2 bg-surface text-white font-heading font-bold uppercase px-4 py-3 border border-white/20 hover:border-secondary transition-colors"
+              data-testid="preview-btn"
+            >
+              <ExternalLink className="w-5 h-5" />
+              <span className="hidden sm:inline">Vista Previa</span>
+            </button>
+            <button
+              onClick={handleSaveAll}
+              disabled={saving}
+              className="flex items-center space-x-2 bg-secondary text-black font-heading font-bold uppercase px-6 py-3 hover:bg-secondary/80 transition-colors disabled:opacity-50"
+              data-testid="save-all-btn"
+            >
+              <Save className="w-5 h-5" />
+              <span>{saving ? 'Guardando...' : 'Guardar Todo'}</span>
+            </button>
+          </div>
         </div>
 
         {message.text && (
