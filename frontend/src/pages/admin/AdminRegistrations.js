@@ -157,5 +157,6 @@ export const AdminRegistrations = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
