@@ -213,6 +213,14 @@ class CategoryPriceUpdate(BaseModel):
     categoria: str
     precio: float
 
+class CategoryCreate(BaseModel):
+    nombre: str
+    precio: float
+
+class CategoryUpdate(BaseModel):
+    nombre: str
+    precio: float
+
 class ContentUpdate(BaseModel):
     key: str
     value: Any
