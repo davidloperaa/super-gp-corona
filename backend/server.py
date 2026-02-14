@@ -415,6 +415,23 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
 async def root():
     return {"message": "API Super GP Corona XP 2026", "version": "2.0.0"}
 
+@api_router.get("/test-email/{email}")
+async def test_email(email: str):
+    """Test endpoint to verify Resend is working"""
+    test_html = """
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #DC2626;">Prueba de Email - Super GP Corona XP</h1>
+        <p>Este es un email de prueba para verificar que Resend está funcionando correctamente.</p>
+        <p style="color: #10B981; font-weight: bold;">¡Si recibes este email, la configuración es correcta!</p>
+    </div>
+    """
+    success = send_email(email, "Prueba - Super GP Corona XP 2026", test_html)
+    
+    if success:
+        return {"status": "success", "message": f"Email de prueba enviado a {email}"}
+    else:
+        return {"status": "error", "message": "Error al enviar email. Revisa los logs del backend."}
+
 @api_router.get("/mercadopago/public-key")
 async def get_mercadopago_public_key():
     """Get the event's MercadoPago public key"""
