@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Calendar, Clock, MapPin, Flag } from 'lucide-react';
+import { useSettings } from '../context/SettingsContext';
 
-const eventos = [
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+// Datos por defecto
+const defaultEventos = [
   {
     dia: 'Jueves 27',
     fecha: '27 de Febrero 2026',
@@ -14,7 +20,7 @@ const eventos = [
     fecha: '28 de Febrero 2026',
     actividades: [
       { hora: '09:00 - 18:00', titulo: 'Entrenamientos', descripcion: 'Sesión de entrenamientos libres todas las categorías' },
-      { hora: '19:00', titulo: 'Reconocimiento y Premiación 2025', descripcion: 'Reconocimiento y premiación Pilotos campeones y subcampeones Campeonato Super GP Corona Club XP 2025' },
+      { hora: '19:00', titulo: 'Reconocimiento y Premiación 2025', descripcion: 'Reconocimiento y premiación Pilotos campeones y subcampeones' },
     ],
   },
   {
@@ -27,7 +33,7 @@ const eventos = [
   },
 ];
 
-const disciplinas = [
+const defaultDisciplinas = [
   { nombre: 'MOTOVELOCIDAD', ubicacion: 'Pista Principal' },
   { nombre: 'SUPERMOTO', ubicacion: 'Circuito Mixto' },
   { nombre: 'VELOTIERRA', ubicacion: 'Pista de Tierra' },
@@ -37,6 +43,39 @@ const disciplinas = [
 ];
 
 export const Calendario = () => {
+  const { settings } = useSettings();
+  const [eventos, setEventos] = useState(defaultEventos);
+  const [disciplinas, setDisciplinas] = useState(defaultDisciplinas);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCalendar();
+  }, []);
+
+  const fetchCalendar = async () => {
+    try {
+      const response = await axios.get(`${API}/calendar`);
+      if (response.data.eventos && response.data.eventos.length > 0) {
+        setEventos(response.data.eventos);
+      }
+      if (response.data.disciplinas && response.data.disciplinas.length > 0) {
+        setDisciplinas(response.data.disciplinas);
+      }
+    } catch (error) {
+      console.error('Error fetching calendar:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-32 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-32 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -52,7 +91,7 @@ export const Calendario = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
           {eventos.map((evento, index) => (
             <div
-              key={index}
+              key={evento.id || index}
               data-testid={`dia-evento-${index}`}
               className="bg-surface border border-white/10 overflow-hidden hover:border-primary/50 transition-all duration-300"
             >
@@ -87,7 +126,7 @@ export const Calendario = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {disciplinas.map((disciplina, index) => (
               <div
-                key={index}
+                key={disciplina.id || index}
                 data-testid={`disciplina-${index}`}
                 className="bg-black/50 border border-white/20 p-6 hover:border-secondary transition-colors group"
               >
@@ -114,8 +153,7 @@ export const Calendario = () => {
                 <MapPin className="w-5 h-5" />
                 <span>Ubicación</span>
               </h3>
-              <p>Corona Club XP</p>
-              <p>Avenida Panamericana, KM 9 El Cofre</p>
+              <p>{settings.event_location || 'Corona Club XP'}</p>
               <p>Popayán, Cauca - Colombia</p>
             </div>
             <div>
