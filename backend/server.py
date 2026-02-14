@@ -231,6 +231,19 @@ async def get_category_prices():
         return prices_doc.get("prices", PRECIOS_BASE)
     return PRECIOS_BASE
 
+async def get_categories_from_db():
+    """Get categories from database, fallback to default CATEGORIAS"""
+    categories_doc = await db.categories.find_one({"_id": "categories_list"})
+    if categories_doc and categories_doc.get("categories"):
+        return categories_doc.get("categories")
+    # Initialize with default categories if not exists
+    await db.categories.update_one(
+        {"_id": "categories_list"},
+        {"$set": {"categories": CATEGORIAS}},
+        upsert=True
+    )
+    return CATEGORIAS
+
 async def update_category_price(categoria: str, precio: float):
     prices = await get_category_prices()
     prices[categoria] = precio
