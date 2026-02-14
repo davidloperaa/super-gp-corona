@@ -98,6 +98,9 @@ export const Footer = () => {
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center text-white/50 text-sm">
           <p>{settings.footer_text}</p>
+          <p className="mt-2 text-white/40">
+            Página web realizada por <span className="text-secondary/70 font-semibold">Vitalaze LLC</span> - Cotiza ahora: <a href="tel:+573103844519" className="text-secondary/70 hover:text-secondary transition-colors">+57 310 384 4519</a>
+          </p>
         </div>
       </div>
     </footer>
