@@ -1,13 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Trophy, DollarSign } from 'lucide-react';
+import { Trophy, DollarSign, Flame, Flag, Car, Mountain, Bike } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Group configuration with colors and icons
+const GROUP_CONFIG = {
+  'VELOCIDAD TOP': {
+    color: 'border-primary bg-primary/10',
+    headerBg: 'bg-primary',
+    icon: Flame,
+    description: 'Premiación: 🥇$1.000.000 | 🥈$420.000 | 🥉$320.000'
+  },
+  'VELOCIDAD': {
+    color: 'border-secondary bg-secondary/10',
+    headerBg: 'bg-secondary',
+    icon: Trophy,
+    description: 'Premiación: 🥇$640.000 | 🥈$400.000 | 🥉$300.000'
+  },
+  'VELOCIDAD RECREATIVAS': {
+    color: 'border-accent bg-accent/10',
+    headerBg: 'bg-accent',
+    icon: Flag,
+    description: 'Sin premiación en efectivo - Trofeos'
+  },
+  'KARTS': {
+    color: 'border-warning bg-warning/10',
+    headerBg: 'bg-warning',
+    icon: Car,
+    description: 'Trofeos'
+  },
+  'VELOTIERRA': {
+    color: 'border-orange-500 bg-orange-500/10',
+    headerBg: 'bg-orange-500',
+    icon: Mountain,
+    description: 'Premiación: 🥇$300.000 | 🥈$200.000 | 🥉$100.000'
+  },
+  'MOTOCROSS': {
+    color: 'border-green-500 bg-green-500/10',
+    headerBg: 'bg-green-500',
+    icon: Bike,
+    description: 'Trofeos'
+  }
+};
+
 export const Categorias = () => {
   const [categorias, setCategorias] = useState([]);
   const [precios, setPrecios] = useState({});
+  const [grupos, setGrupos] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,6 +60,7 @@ export const Categorias = () => {
       const response = await axios.get(`${API}/categories`);
       setCategorias(response.data.categorias);
       setPrecios(response.data.precios);
+      setGrupos(response.data.grupos || {});
     } catch (error) {
       console.error('Error fetching categorias:', error);
     } finally {
@@ -26,26 +68,8 @@ export const Categorias = () => {
     }
   };
 
-  const getCategoryType = (cat) => {
-    if (cat.includes('INFANTIL') || cat.includes('Infantil')) return 'infantil';
-    if (cat.includes('Kart')) return 'karts';
-    if (cat.includes('Motocross')) return 'motocross';
-    if (cat.includes('Veloarena')) return 'veloarena';
-    if (cat.includes('Élite') || cat.includes('Elite')) return 'elite';
-    return 'general';
-  };
-
-  const getCategoryColor = (type) => {
-    const colors = {
-      infantil: 'border-warning',
-      karts: 'border-secondary',
-      motocross: 'border-primary',
-      veloarena: 'border-accent',
-      elite: 'border-primary',
-      general: 'border-white/20',
-    };
-    return colors[type] || colors.general;
-  };
+  // Group order
+  const groupOrder = ['VELOCIDAD TOP', 'VELOCIDAD', 'VELOCIDAD RECREATIVAS', 'KARTS', 'VELOTIERRA', 'MOTOCROSS'];
 
   if (loading) {
     return (
@@ -66,66 +90,93 @@ export const Categorias = () => {
             CATEGORÍAS
           </h1>
           <p className="text-white/80 text-lg max-w-2xl mx-auto">
-            32 categorías disponibles para todos los niveles y edades. Encuentra la tuya y prepárate para competir.
+            30 categorías disponibles para todos los niveles. Encuentra la tuya y prepárate para competir.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categorias.map((categoria, index) => {
-            const type = getCategoryType(categoria);
-            const color = getCategoryColor(type);
-            const precio = precios[categoria] || 0;
+        {/* Categories by Group */}
+        <div className="space-y-12">
+          {groupOrder.map((groupName) => {
+            const groupCategories = grupos[groupName] || [];
+            if (groupCategories.length === 0) return null;
+            
+            const config = GROUP_CONFIG[groupName] || GROUP_CONFIG['VELOCIDAD'];
+            const IconComponent = config.icon;
 
             return (
-              <div
-                key={index}
-                data-testid={`categoria-card-${index}`}
-                className={`bg-surface border-2 ${color} p-6 hover:border-opacity-100 transition-all duration-300 group relative overflow-hidden`}
-              >
-                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                
-                <div className="flex items-start justify-between mb-4">
-                  <Trophy className="w-8 h-8 text-primary" />
-                  <span className={`text-xs uppercase font-heading font-bold px-2 py-1 border ${color}`}>
-                    {type}
-                  </span>
+              <div key={groupName} className="mb-12">
+                {/* Group Header */}
+                <div className={`${config.headerBg} p-6 mb-6`}>
+                  <div className="flex items-center space-x-4">
+                    <IconComponent className="w-10 h-10 text-white" />
+                    <div>
+                      <h2 className="font-heading text-3xl font-black uppercase text-white">
+                        {groupName}
+                      </h2>
+                      <p className="text-white/90 text-sm mt-1">{config.description}</p>
+                    </div>
+                  </div>
                 </div>
 
-                <h3 className="font-heading text-xl font-bold uppercase mb-3 group-hover:text-primary transition-colors">
-                  {categoria}
-                </h3>
+                {/* Categories Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {groupCategories.map((categoria, index) => {
+                    const precio = precios[categoria] || 100000;
 
-                <div className="flex items-center space-x-2 text-white/70">
-                  <DollarSign className="w-4 h-4" />
-                  <span className="font-heading font-bold">
-                    COP {precio.toLocaleString()}
-                  </span>
+                    return (
+                      <div
+                        key={index}
+                        data-testid={`categoria-card-${groupName}-${index}`}
+                        className={`border-2 ${config.color} p-5 hover:scale-[1.02] transition-all duration-300 group`}
+                      >
+                        <h3 className="font-heading text-lg font-bold uppercase mb-3 group-hover:text-white transition-colors">
+                          {categoria}
+                        </h3>
+
+                        <div className="flex items-center space-x-2 text-white/70">
+                          <DollarSign className="w-4 h-4" />
+                          <span className="font-heading font-bold">
+                            COP {precio.toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
           })}
         </div>
 
+        {/* Pricing Info */}
         <div className="mt-16 bg-surface border border-white/10 p-8">
-          <h2 className="font-heading text-2xl font-bold uppercase mb-4 text-center">Información Importante</h2>
-          <ul className="space-y-3 text-white/80 max-w-3xl mx-auto">
-            <li className="flex items-start space-x-3">
-              <span className="text-primary font-bold">•</span>
-              <span>Los precios mostrados corresponden a la fase actual de inscripción.</span>
-            </li>
-            <li className="flex items-start space-x-3">
-              <span className="text-primary font-bold">•</span>
-              <span>Puedes inscribirte en múltiples categorías si cumples los requisitos.</span>
-            </li>
-            <li className="flex items-start space-x-3">
-              <span className="text-primary font-bold">•</span>
-              <span>Los precios varían según la fase: Preventa (15% descuento), Ordinaria (precio normal), Extraordinaria (+20%).</span>
-            </li>
-            <li className="flex items-start space-x-3">
-              <span className="text-primary font-bold">•</span>
-              <span>Cupones de descuento disponibles: 30%, 50% y 100% según disponibilidad.</span>
-            </li>
-          </ul>
+          <h2 className="font-heading text-2xl font-bold uppercase mb-6 text-center text-glow-cyan">
+            Precios de Inscripción
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-green-500/20 border border-green-500 p-4 text-center">
+              <p className="font-heading font-black text-2xl text-green-400">$100.000</p>
+              <p className="text-white/70 text-sm">Hasta Miércoles 18 Feb</p>
+            </div>
+            <div className="bg-yellow-500/20 border border-yellow-500 p-4 text-center">
+              <p className="font-heading font-black text-2xl text-yellow-400">$120.000</p>
+              <p className="text-white/70 text-sm">Hasta Lunes 23 Feb</p>
+            </div>
+            <div className="bg-orange-500/20 border border-orange-500 p-4 text-center">
+              <p className="font-heading font-black text-2xl text-orange-400">$144.000</p>
+              <p className="text-white/70 text-sm">Hasta Viernes 27 Feb 3PM</p>
+            </div>
+            <div className="bg-red-500/20 border border-red-500 p-4 text-center">
+              <p className="font-heading font-black text-2xl text-red-400">$173.000</p>
+              <p className="text-white/70 text-sm">Hasta Sábado 28 Feb</p>
+            </div>
+          </div>
+          <p className="text-center text-white/70">
+            <span className="text-warning">⚠️</span> Excepción: Pilotos LICAMO: $40.000 (precio fijo)
+          </p>
+          <p className="text-center text-white/50 text-sm mt-2">
+            Devoluciones con excusa hasta el Viernes 27 de Febrero
+          </p>
         </div>
       </div>
     </div>
