@@ -194,6 +194,11 @@ class AdminCreate(BaseModel):
     email: str
     password: str
 
+class SuperAdminCreate(BaseModel):
+    email: str
+    password: str
+    secret_key: str
+
 class CouponCreate(BaseModel):
     codigo: str
     tipo_descuento: int
