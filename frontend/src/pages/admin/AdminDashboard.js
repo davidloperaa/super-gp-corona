@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Users, Ticket, Newspaper, LogOut, DollarSign, Settings, Image, List } from 'lucide-react';
+import { Users, Ticket, Newspaper, LogOut, DollarSign, Settings, Image, List, Calendar } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -192,6 +192,18 @@ export const AdminDashboard = () => {
               Gestionar Galería
             </h2>
             <p className="text-white/70">Subir y organizar imágenes del evento</p>
+          </Link>
+
+          <Link
+            to="/admin/calendario"
+            data-testid="link-calendario"
+            className="bg-surface border-2 border-white/10 p-8 hover:border-secondary transition-colors group"
+          >
+            <Calendar className="w-12 h-12 text-secondary mb-4" />
+            <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-secondary transition-colors">
+              Gestionar Calendario
+            </h2>
+            <p className="text-white/70">Editar días, actividades y disciplinas</p>
           </Link>
 
           <Link
