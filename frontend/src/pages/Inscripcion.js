@@ -14,6 +14,7 @@ export const Inscripcion = () => {
   const [loading, setLoading] = useState(false);
   const [categorias, setCategorias] = useState([]);
   const [precios, setPrecios] = useState({});
+  const [grupos, setGrupos] = useState({});
   const [codigoCupon, setCodigoCupon] = useState('');
   const [cuponValido, setCuponValido] = useState(false);
   const [precioCalculado, setPrecioCalculado] = useState(null);
@@ -46,6 +47,7 @@ export const Inscripcion = () => {
       const response = await axios.get(`${API}/categories`);
       setCategorias(response.data.categorias);
       setPrecios(response.data.precios);
+      setGrupos(response.data.grupos || {});
     } catch (error) {
       console.error('Error fetching categorias:', error);
     }
