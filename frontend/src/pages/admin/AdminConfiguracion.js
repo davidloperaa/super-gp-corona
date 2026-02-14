@@ -448,6 +448,7 @@ export const AdminConfiguracion = () => {
           </button>
         </div>
       </div>
+      </div>
     </>
   );
 };
