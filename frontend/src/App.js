@@ -42,6 +42,7 @@ function App() {
           <Route path="/calendario" element={<Calendario />} />
           <Route path="/galeria" element={<Galeria />} />
           <Route path="/inscripcion" element={<Inscripcion />} />
+          <Route path="/inscripciones" element={<Inscripcion />} />
           <Route path="/noticias" element={<Noticias />} />
           
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
