@@ -163,5 +163,6 @@ export const AdminContenido = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
