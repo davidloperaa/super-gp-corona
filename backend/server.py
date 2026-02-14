@@ -668,6 +668,100 @@ async def get_admin_category_prices(payload: dict = Depends(verify_token)):
     prices = await get_category_prices()
     return {"prices": prices}
 
+@api_router.get("/admin/categories")
+async def get_admin_categories(payload: dict = Depends(verify_token)):
+    """Get all categories with their prices for admin"""
+    categories = await get_categories_from_db()
+    prices = await get_category_prices()
+    return {"categories": categories, "prices": prices}
+
+@api_router.post("/admin/categories")
+async def create_category(category: CategoryCreate, payload: dict = Depends(verify_token)):
+    """Create a new category"""
+    categories = await get_categories_from_db()
+    
+    if category.nombre in categories:
+        raise HTTPException(status_code=400, detail="La categoría ya existe")
+    
+    # Add to categories list
+    categories.append(category.nombre)
+    await db.categories.update_one(
+        {"_id": "categories_list"},
+        {"$set": {"categories": categories}},
+        upsert=True
+    )
+    
+    # Set the price
+    await update_category_price(category.nombre, category.precio)
+    
+    return {"message": "Categoría creada exitosamente", "categoria": category.nombre}
+
+@api_router.put("/admin/categories/{old_name}")
+async def update_category(old_name: str, category: CategoryUpdate, payload: dict = Depends(verify_token)):
+    """Update a category name and/or price"""
+    categories = await get_categories_from_db()
+    prices = await get_category_prices()
+    
+    if old_name not in categories:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    
+    # Update category name if changed
+    if old_name != category.nombre:
+        if category.nombre in categories:
+            raise HTTPException(status_code=400, detail="El nuevo nombre ya existe")
+        
+        # Replace old name with new name
+        index = categories.index(old_name)
+        categories[index] = category.nombre
+        await db.categories.update_one(
+            {"_id": "categories_list"},
+            {"$set": {"categories": categories}},
+            upsert=True
+        )
+        
+        # Update price key
+        if old_name in prices:
+            del prices[old_name]
+        prices[category.nombre] = category.precio
+        await db.category_prices.update_one(
+            {"_id": "prices"},
+            {"$set": {"prices": prices}},
+            upsert=True
+        )
+    else:
+        # Just update price
+        await update_category_price(category.nombre, category.precio)
+    
+    return {"message": "Categoría actualizada exitosamente", "categoria": category.nombre}
+
+@api_router.delete("/admin/categories/{nombre}")
+async def delete_category(nombre: str, payload: dict = Depends(verify_token)):
+    """Delete a category"""
+    categories = await get_categories_from_db()
+    prices = await get_category_prices()
+    
+    if nombre not in categories:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    
+    # Remove from categories list
+    categories.remove(nombre)
+    await db.categories.update_one(
+        {"_id": "categories_list"},
+        {"$set": {"categories": categories}},
+        upsert=True
+    )
+    
+    # Remove price
+    if nombre in prices:
+        del prices[nombre]
+        await db.category_prices.update_one(
+            {"_id": "prices"},
+            {"$set": {"prices": prices}},
+            upsert=True
+        )
+    
+    return {"message": "Categoría eliminada exitosamente"}
+
 @api_router.put("/admin/content")
 async def update_content(update: ContentUpdate, payload: dict = Depends(verify_token)):
     await db.site_content.update_one(
