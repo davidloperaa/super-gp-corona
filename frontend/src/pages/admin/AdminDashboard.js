@@ -147,6 +147,18 @@ export const AdminDashboard = () => {
           </Link>
 
           <Link
+            to="/admin/categorias"
+            data-testid="link-gestionar-categorias"
+            className="bg-surface border-2 border-white/10 p-8 hover:border-primary transition-colors group"
+          >
+            <List className="w-12 h-12 text-primary mb-4" />
+            <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-primary transition-colors">
+              Gestionar Categorías
+            </h2>
+            <p className="text-white/70">Agregar, editar o eliminar categorías</p>
+          </Link>
+
+          <Link
             to="/admin/contenido"
             data-testid="link-gestionar-contenido"
             className="bg-surface border-2 border-white/10 p-8 hover:border-secondary transition-colors group"
