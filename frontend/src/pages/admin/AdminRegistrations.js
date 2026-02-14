@@ -451,6 +451,47 @@ export const AdminRegistrations = () => {
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteAllModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface border border-white/20 p-6 max-w-md w-full">
+            <div className="flex items-center space-x-3 mb-4">
+              <AlertTriangle className="w-8 h-8 text-red-500" />
+              <h3 className="font-heading text-xl font-bold uppercase text-red-500">
+                ¡ADVERTENCIA!
+              </h3>
+            </div>
+            
+            <p className="text-white mb-4">
+              {deleteAllType === 'all' 
+                ? `¿Estás seguro de eliminar TODAS las ${registrations.length} inscripciones? Esta acción NO se puede deshacer.`
+                : `¿Estás seguro de eliminar todas las inscripciones con estado "${deleteAllType}"? Esta acción NO se puede deshacer.`
+              }
+            </p>
+            
+            <p className="text-warning text-sm mb-6">
+              Se recomienda exportar los datos antes de eliminar.
+            </p>
+            
+            <div className="flex space-x-3">
+              <button
+                onClick={() => { setShowDeleteAllModal(false); setDeleteAllType(null); }}
+                className="flex-1 bg-white/10 text-white font-heading font-bold uppercase px-4 py-3 hover:bg-white/20 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDeleteAll(deleteAllType)}
+                className="flex-1 bg-red-600 text-white font-heading font-bold uppercase px-4 py-3 hover:bg-red-700 transition-colors"
+                data-testid="btn-confirm-delete"
+              >
+                Sí, Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
