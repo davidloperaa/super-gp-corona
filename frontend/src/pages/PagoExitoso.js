@@ -65,13 +65,26 @@ export const PagoExitoso = () => {
     <div className="min-h-screen pt-32 pb-24">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <CheckCircle className="w-24 h-24 text-secondary mx-auto mb-6" />
+          <CheckCircle className={`w-24 h-24 mx-auto mb-6 ${registration?.estado_pago === 'completado' ? 'text-secondary' : 'text-warning'}`} />
           <h1 className="font-heading text-5xl font-black uppercase text-glow-cyan mb-4" data-testid="pago-exitoso-title">
-            ¡PAGO EXITOSO!
+            {registration?.estado_pago === 'completado' ? '¡PAGO CONFIRMADO!' : '¡PAGO EN PROCESO!'}
           </h1>
           <p className="text-white/80 text-lg">
-            Tu inscripción ha sido confirmada. Recibirás un correo de confirmación en breve.
+            {registration?.estado_pago === 'completado' 
+              ? 'Tu inscripción ha sido confirmada. Recibirás un correo de confirmación.'
+              : 'Tu pago está siendo procesado. Por favor espera unos momentos.'}
           </p>
+          
+          {registration?.estado_pago !== 'completado' && (
+            <button
+              onClick={handleRetryVerification}
+              disabled={verifying}
+              className="mt-4 flex items-center space-x-2 bg-warning text-black font-heading font-bold uppercase px-6 py-3 mx-auto hover:bg-warning/80 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-5 h-5 ${verifying ? 'animate-spin' : ''}`} />
+              <span>{verifying ? 'Verificando...' : 'Verificar Pago'}</span>
+            </button>
+          )}
         </div>
 
         {registration && (
