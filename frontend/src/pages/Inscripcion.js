@@ -305,16 +305,27 @@ export const Inscripcion = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-heading font-bold mb-2">Celular *</label>
+                  <label className="block text-sm font-heading font-bold mb-2">Celular * <span className="text-white/50 font-normal">(10 dígitos)</span></label>
                   <input
                     type="tel"
                     name="celular"
                     data-testid="input-celular"
                     value={formData.celular}
                     onChange={handleInputChange}
+                    placeholder="Ej: 3001234567"
+                    maxLength={15}
                     className="w-full bg-black/50 border border-white/20 focus:border-primary text-white h-12 px-4 outline-none"
                   />
-                  {errors.celular && <p className="text-primary text-sm mt-1">{errors.celular}</p>}
+                  <div className="flex justify-between mt-1">
+                    {errors.celular ? (
+                      <p className="text-primary text-sm">{errors.celular}</p>
+                    ) : (
+                      <span></span>
+                    )}
+                    <span className={`text-xs ${formData.celular.replace(/\D/g, '').length >= 10 ? 'text-green-500' : 'text-white/50'}`}>
+                      {formData.celular.replace(/\D/g, '').length}/10 dígitos
+                    </span>
+                  </div>
                 </div>
 
                 <div>
