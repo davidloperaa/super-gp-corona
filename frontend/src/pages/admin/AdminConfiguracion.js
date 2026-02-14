@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Settings, Save, Palette, Image, Calendar, Link as LinkIcon, Upload, X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useSettings } from '../../context/SettingsContext';
+import { AdminNavbar } from '../../components/AdminNavbar';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;

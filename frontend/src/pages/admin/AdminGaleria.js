@@ -5,6 +5,7 @@ import {
   Image, Upload, Trash2, GripVertical, X, Plus, Save, 
   AlertCircle, CheckCircle
 } from 'lucide-react';
+import { AdminNavbar } from '../../components/AdminNavbar';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;

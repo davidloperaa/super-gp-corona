@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { QrCode, Check, Users, TrendingUp } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { AdminNavbar } from '../../components/AdminNavbar';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
