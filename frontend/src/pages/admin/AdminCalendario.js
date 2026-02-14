@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
   Calendar, Plus, Trash2, Save, Clock, MapPin, Flag,
-  CheckCircle, AlertCircle, GripVertical
+  CheckCircle, AlertCircle, GripVertical, ExternalLink
 } from 'lucide-react';
 import { AdminNavbar } from '../../components/AdminNavbar';
 
@@ -142,15 +142,25 @@ export const AdminCalendario = () => {
             <h1 className="font-heading text-4xl font-black uppercase text-glow-red">
               GESTIÓN DE CALENDARIO
             </h1>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="flex items-center space-x-2 bg-secondary text-black font-heading font-bold uppercase px-6 py-3 hover:bg-secondary/80 transition-colors disabled:opacity-50"
-              data-testid="btn-guardar-calendario"
-            >
-              <Save className="w-5 h-5" />
-              <span>{saving ? 'Guardando...' : 'Guardar Todo'}</span>
-            </button>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => window.open('/calendario', '_blank')}
+                className="flex items-center space-x-2 bg-surface text-white font-heading font-bold uppercase px-4 py-3 border border-white/20 hover:border-secondary transition-colors"
+                data-testid="preview-calendario-btn"
+              >
+                <ExternalLink className="w-5 h-5" />
+                <span className="hidden sm:inline">Vista Previa</span>
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="flex items-center space-x-2 bg-secondary text-black font-heading font-bold uppercase px-6 py-3 hover:bg-secondary/80 transition-colors disabled:opacity-50"
+                data-testid="btn-guardar-calendario"
+              >
+                <Save className="w-5 h-5" />
+                <span>{saving ? 'Guardando...' : 'Guardar Todo'}</span>
+              </button>
+            </div>
           </div>
 
           {message.text && (
