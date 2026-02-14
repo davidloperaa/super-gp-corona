@@ -419,8 +419,9 @@ async def get_mercadopago_public_key():
 
 @api_router.get("/categories")
 async def get_categories():
+    categories = await get_categories_from_db()
     prices = await get_category_prices()
-    return {"categorias": CATEGORIAS, "precios": prices}
+    return {"categorias": categories, "precios": prices}
 
 @api_router.post("/registrations/calculate")
 async def calculate_registration_price(data: dict):
