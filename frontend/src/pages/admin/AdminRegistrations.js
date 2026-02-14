@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Users, Download, Filter, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { Users, Download, Filter, CheckCircle, XCircle, RefreshCw, Trash2, AlertTriangle } from 'lucide-react';
 import { AdminNavbar } from '../../components/AdminNavbar';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
