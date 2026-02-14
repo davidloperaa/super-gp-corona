@@ -954,6 +954,51 @@ async def delete_category(nombre: str, payload: dict = Depends(verify_token)):
     
     return {"message": "Categoría eliminada exitosamente"}
 
+@api_router.put("/admin/category-groups")
+async def update_category_groups(data: dict, payload: dict = Depends(verify_token)):
+    """Update category groups"""
+    groups = data.get("grupos", {})
+    await db.category_groups.update_one(
+        {"_id": "groups"},
+        {"$set": {"groups": groups}},
+        upsert=True
+    )
+    return {"message": "Grupos actualizados exitosamente", "grupos": groups}
+
+@api_router.put("/admin/categories-bulk")
+async def bulk_update_categories(data: dict, payload: dict = Depends(verify_token)):
+    """Bulk update categories, prices and groups - replaces all existing data"""
+    categorias = data.get("categorias", [])
+    precios = data.get("precios", {})
+    grupos = data.get("grupos", {})
+    
+    # Update categories list
+    await db.categories.update_one(
+        {"_id": "categories_list"},
+        {"$set": {"categories": categorias}},
+        upsert=True
+    )
+    
+    # Update prices
+    await db.category_prices.update_one(
+        {"_id": "prices"},
+        {"$set": {"prices": precios}},
+        upsert=True
+    )
+    
+    # Update groups
+    await db.category_groups.update_one(
+        {"_id": "groups"},
+        {"$set": {"groups": grupos}},
+        upsert=True
+    )
+    
+    return {
+        "message": "Categorías actualizadas exitosamente",
+        "total_categorias": len(categorias),
+        "total_grupos": len(grupos)
+    }
+
 @api_router.put("/admin/content")
 async def update_content(update: ContentUpdate, payload: dict = Depends(verify_token)):
     await db.site_content.update_one(
