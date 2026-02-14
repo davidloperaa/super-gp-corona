@@ -141,7 +141,9 @@ export const AdminGaleria = () => {
   }
 
   return (
-    <div className="min-h-screen pt-32 pb-24">
+    <>
+      <AdminNavbar title="Gestión de Galería" />
+      <div className="min-h-screen pt-24 pb-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center mb-8">
           <h1 className="font-heading text-4xl font-black uppercase text-glow-red">
@@ -258,6 +260,6 @@ export const AdminGaleria = () => {
           </>
         )}
       </div>
-    </div>
+    </>
   );
 };
