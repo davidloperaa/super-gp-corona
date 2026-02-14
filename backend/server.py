@@ -652,7 +652,9 @@ async def get_news():
 
 @api_router.put("/admin/category-price")
 async def update_price(update: CategoryPriceUpdate, payload: dict = Depends(verify_token)):
-    if update.categoria not in CATEGORIAS:
+    # Get categories from database
+    categories = await get_categories_from_db()
+    if update.categoria not in categories:
         raise HTTPException(status_code=400, detail="Categoría no válida")
     
     await update_category_price(update.categoria, update.precio)
