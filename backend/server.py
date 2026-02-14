@@ -293,7 +293,6 @@ def send_email(to: str, subject: str, html: str, cc: Optional[str] = None):
 
 def generate_qr_url(registration_id: str, secret_key: str) -> str:
     """Generate a QR code URL using quickchart.io service (compatible with email clients)"""
-    import urllib.parse
     verification_hash = hashlib.sha256(
         f"{registration_id}{secret_key}".encode()
     ).hexdigest()[:16]
