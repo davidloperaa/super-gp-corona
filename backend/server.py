@@ -965,6 +965,73 @@ async def get_content():
     contents = await db.site_content.find({}, {"_id": 0}).to_list(100)
     return {"contents": {c["key"]: c["value"] for c in contents}}
 
+# ==================== CALENDAR ENDPOINTS ====================
+
+DEFAULT_CALENDAR = [
+    {
+        "id": "dia-1",
+        "dia": "Jueves 27",
+        "fecha": "27 de Febrero 2026",
+        "actividades": [
+            {"hora": "19:00", "titulo": "Aguapanelazo", "descripcion": "Recepción y acreditación de pilotos"}
+        ]
+    },
+    {
+        "id": "dia-2", 
+        "dia": "Viernes 28",
+        "fecha": "28 de Febrero 2026",
+        "actividades": [
+            {"hora": "09:00 - 18:00", "titulo": "Entrenamientos", "descripcion": "Sesión de entrenamientos libres todas las categorías"},
+            {"hora": "19:00", "titulo": "Reconocimiento y Premiación 2025", "descripcion": "Reconocimiento y premiación Pilotos campeones y subcampeones"}
+        ]
+    },
+    {
+        "id": "dia-3",
+        "dia": "Sábado 1",
+        "fecha": "1 de Marzo 2026",
+        "actividades": [
+            {"hora": "08:00 - 17:00", "titulo": "CARRERAS", "descripcion": "Carreras - Todas las categorías"},
+            {"hora": "18:00", "titulo": "Premiación", "descripcion": "Ceremonia de premiación y entrega de trofeos"}
+        ]
+    }
+]
+
+DEFAULT_DISCIPLINES = [
+    {"id": "1", "nombre": "MOTOVELOCIDAD", "ubicacion": "Pista Principal"},
+    {"id": "2", "nombre": "SUPERMOTO", "ubicacion": "Circuito Mixto"},
+    {"id": "3", "nombre": "VELOTIERRA", "ubicacion": "Pista de Tierra"},
+    {"id": "4", "nombre": "MOTOCROSS", "ubicacion": "Track Motocross"},
+    {"id": "5", "nombre": "VELOARENA", "ubicacion": "Arena Indoor"},
+    {"id": "6", "nombre": "KARTS", "ubicacion": "Kartodromo"}
+]
+
+@api_router.get("/calendar")
+async def get_calendar():
+    """Get calendar events and disciplines"""
+    calendar_doc = await db.calendar.find_one({"_id": "calendar"}, {"_id": 0})
+    if not calendar_doc:
+        return {"eventos": DEFAULT_CALENDAR, "disciplinas": DEFAULT_DISCIPLINES}
+    return {
+        "eventos": calendar_doc.get("eventos", DEFAULT_CALENDAR),
+        "disciplinas": calendar_doc.get("disciplinas", DEFAULT_DISCIPLINES)
+    }
+
+@api_router.put("/admin/calendar")
+async def update_calendar(data: dict, payload: dict = Depends(verify_token)):
+    """Update calendar events and disciplines"""
+    update_data = {
+        "eventos": data.get("eventos", []),
+        "disciplinas": data.get("disciplinas", []),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.calendar.update_one(
+        {"_id": "calendar"},
+        {"$set": update_data},
+        upsert=True
+    )
+    return {"message": "Calendario actualizado exitosamente"}
+
 @api_router.post("/admin/login")
 async def admin_login(credentials: AdminLogin):
     admin = await db.admins.find_one({"email": credentials.email}, {"_id": 0})
