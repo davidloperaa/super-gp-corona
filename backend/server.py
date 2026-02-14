@@ -791,6 +791,41 @@ async def get_registration(registration_id: str):
         reg['created_at'] = datetime.fromisoformat(reg['created_at'])
     return reg
 
+@api_router.delete("/admin/registrations/{registration_id}")
+async def delete_registration(registration_id: str, payload: dict = Depends(verify_token)):
+    """Delete a single registration"""
+    reg = await db.registrations.find_one({"id": registration_id})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    result = await db.registrations.delete_one({"id": registration_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=500, detail="Error al eliminar inscripción")
+    
+    return {"message": "Inscripción eliminada exitosamente", "id": registration_id}
+
+@api_router.delete("/admin/registrations")
+async def delete_all_registrations(payload: dict = Depends(verify_token)):
+    """Delete all registrations - USE WITH CAUTION"""
+    result = await db.registrations.delete_many({})
+    return {
+        "message": f"Se eliminaron {result.deleted_count} inscripciones",
+        "deleted_count": result.deleted_count
+    }
+
+@api_router.delete("/admin/registrations/status/{status}")
+async def delete_registrations_by_status(status: str, payload: dict = Depends(verify_token)):
+    """Delete registrations by payment status (pendiente or completado)"""
+    if status not in ["pendiente", "completado"]:
+        raise HTTPException(status_code=400, detail="Estado no válido. Use 'pendiente' o 'completado'")
+    
+    result = await db.registrations.delete_many({"estado_pago": status})
+    return {
+        "message": f"Se eliminaron {result.deleted_count} inscripciones con estado '{status}'",
+        "deleted_count": result.deleted_count
+    }
+
 @api_router.post("/coupons/validate")
 async def validate_coupon(data: dict):
     codigo = data.get("codigo", "").upper()
