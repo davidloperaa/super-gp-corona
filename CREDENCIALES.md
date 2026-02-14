@@ -2,11 +2,11 @@
 
 ## 🏍️ Acceso a la Aplicación
 
-**URL Pública:** https://coronaxp-build.preview.emergentagent.com
+**URL Pública:** https://racing-championship-2.preview.emergentagent.com
 
 ## 🔐 Credenciales de Administrador
 
-**Panel Admin:** https://coronaxp-build.preview.emergentagent.com/admin/login
+**Panel Admin:** https://racing-championship-2.preview.emergentagent.com/admin/login
 
 - **Email:** admin@coronaxp.com
 - **Contraseña:** Admin123
