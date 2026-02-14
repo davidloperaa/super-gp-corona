@@ -580,6 +580,83 @@ async def mercadopago_webhook(request: Request):
         logging.error(f"Webhook error: {str(e)}")
         return {"status": "error", "message": str(e)}
 
+@api_router.post("/payments/verify/{registration_id}")
+async def verify_payment(registration_id: str):
+    """Verify payment status with MercadoPago and update registration"""
+    try:
+        reg = await db.registrations.find_one({"id": registration_id})
+        if not reg:
+            raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+        
+        # If already completed, return current status
+        if reg.get("estado_pago") == "completado":
+            return {"status": "completed", "message": "Pago ya confirmado"}
+        
+        preference_id = reg.get("mercadopago_preference_id")
+        if not preference_id:
+            return {"status": "pending", "message": "Sin preferencia de pago"}
+        
+        # Search for payments with this external reference
+        mp_config = await get_event_mercadopago_config()
+        event_sdk = mercadopago.SDK(mp_config.get("mercadopago_access_token", MERCADOPAGO_ACCESS_TOKEN))
+        
+        # Search payments by external_reference
+        search_result = event_sdk.payment().search({
+            "external_reference": registration_id
+        })
+        
+        payments = search_result.get("response", {}).get("results", [])
+        
+        for payment in payments:
+            if payment.get("status") == "approved":
+                # Update registration
+                await db.registrations.update_one(
+                    {"id": registration_id},
+                    {
+                        "$set": {
+                            "estado_pago": "completado",
+                            "mercadopago_payment_id": str(payment.get("id"))
+                        }
+                    }
+                )
+                
+                # Send confirmation email
+                updated_reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
+                email_html = generate_confirmation_email(updated_reg, updated_reg.get('qr_code'))
+                send_email(updated_reg["correo"], "Confirmación de Inscripción - Super GP Corona XP 2026", email_html, EMAIL_ADMIN)
+                
+                return {"status": "completed", "message": "Pago confirmado exitosamente"}
+        
+        return {"status": "pending", "message": "Pago aún no confirmado"}
+        
+    except Exception as e:
+        logging.error(f"Error verifying payment: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
+@api_router.put("/admin/registrations/{registration_id}/status")
+async def update_registration_status(registration_id: str, data: dict, payload: dict = Depends(verify_token)):
+    """Manually update registration payment status (admin only)"""
+    new_status = data.get("estado_pago")
+    if new_status not in ["pendiente", "completado"]:
+        raise HTTPException(status_code=400, detail="Estado no válido")
+    
+    reg = await db.registrations.find_one({"id": registration_id})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    await db.registrations.update_one(
+        {"id": registration_id},
+        {"$set": {"estado_pago": new_status}}
+    )
+    
+    # If marking as completed and email not sent, send it
+    if new_status == "completado":
+        updated_reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
+        email_html = generate_confirmation_email(updated_reg, updated_reg.get('qr_code'))
+        send_email(updated_reg["correo"], "Confirmación de Inscripción - Super GP Corona XP 2026", email_html, EMAIL_ADMIN)
+    
+    return {"message": f"Estado actualizado a {new_status}"}
+
 @api_router.get("/registrations")
 async def get_registrations(payload: dict = Depends(verify_token)):
     registrations = await db.registrations.find({}, {"_id": 0}).to_list(1000)
