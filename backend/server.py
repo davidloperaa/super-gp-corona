@@ -523,7 +523,8 @@ async def create_payment_preference(data: dict):
         "auto_return": "approved",
         "external_reference": registration_id,
         "statement_descriptor": "SUPER GP CORONA",
-        "binary_mode": False
+        "binary_mode": False,
+        "notification_url": "https://corona-backend.dhvxzc.easypanel.host/api/webhooks/mercadopago"
     }
     
     try:
