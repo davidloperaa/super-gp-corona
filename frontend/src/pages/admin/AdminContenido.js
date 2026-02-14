@@ -102,27 +102,29 @@ export const AdminContenido = () => {
   }
 
   return (
-    <div className="min-h-screen pt-32 pb-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="font-heading text-5xl font-black uppercase text-glow-red" data-testid="contenido-title">
-            GESTIONAR CONTENIDO
-          </h1>
-          <button
-            onClick={handleSaveAll}
-            disabled={saving}
-            data-testid="btn-guardar-todo"
-            className="flex items-center space-x-2 bg-secondary text-black font-heading font-bold uppercase px-6 py-3 hover:bg-secondary/80 transition-colors disabled:opacity-50"
-          >
-            <Save className="w-5 h-5" />
-            <span>{saving ? 'Guardando...' : 'Guardar Todo'}</span>
-          </button>
-        </div>
+    <>
+      <AdminNavbar title="Gestionar Contenido" />
+      <div className="min-h-screen pt-24 pb-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-12">
+            <h1 className="font-heading text-5xl font-black uppercase text-glow-red" data-testid="contenido-title">
+              GESTIONAR CONTENIDO
+            </h1>
+            <button
+              onClick={handleSaveAll}
+              disabled={saving}
+              data-testid="btn-guardar-todo"
+              className="flex items-center space-x-2 bg-secondary text-black font-heading font-bold uppercase px-6 py-3 hover:bg-secondary/80 transition-colors disabled:opacity-50"
+            >
+              <Save className="w-5 h-5" />
+              <span>{saving ? 'Guardando...' : 'Guardar Todo'}</span>
+            </button>
+          </div>
 
-        <div className="bg-surface border border-white/10 p-6 mb-8">
-          <p className="text-white/80">
-            Edita el contenido de las diferentes secciones de la página web.
-          </p>
+          <div className="bg-surface border border-white/10 p-6 mb-8">
+            <p className="text-white/80">
+              Edita el contenido de las diferentes secciones de la página web.
+            </p>
         </div>
 
         <div className="space-y-6">
