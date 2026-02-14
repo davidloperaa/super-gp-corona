@@ -168,11 +168,13 @@ export const AdminCategorias = () => {
   }
 
   return (
-    <div className="min-h-screen pt-32 pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-12">
-          <h1 className="font-heading text-5xl font-black uppercase text-glow-red" data-testid="categorias-title">
-            GESTIONAR CATEGORÍAS
+    <>
+      <AdminNavbar title="Gestionar Categorías" />
+      <div className="min-h-screen pt-24 pb-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-12">
+            <h1 className="font-heading text-5xl font-black uppercase text-glow-red" data-testid="categorias-title">
+              GESTIONAR CATEGORÍAS
           </h1>
           <button
             onClick={() => setShowAddForm(true)}
