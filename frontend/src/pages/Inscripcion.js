@@ -86,8 +86,15 @@ export const Inscripcion = () => {
       if (!formData.nombre) newErrors.nombre = 'Nombre requerido';
       if (!formData.apellido) newErrors.apellido = 'Apellido requerido';
       if (!formData.cedula) newErrors.cedula = 'Cédula requerida';
+      if (formData.cedula && formData.cedula.length < 5) {
+        newErrors.cedula = 'La cédula debe tener al menos 5 caracteres';
+      }
       if (!formData.numero_competicion) newErrors.numero_competicion = 'Número de competición requerido';
-      if (!formData.celular) newErrors.celular = 'Celular requerido';
+      if (!formData.celular) {
+        newErrors.celular = 'Celular requerido';
+      } else if (formData.celular.replace(/\D/g, '').length < 10) {
+        newErrors.celular = 'El celular debe tener al menos 10 dígitos';
+      }
       if (!formData.correo) newErrors.correo = 'Correo requerido';
       if (formData.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.correo)) {
         newErrors.correo = 'Correo inválido';
@@ -155,8 +162,44 @@ export const Inscripcion = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      const errorMessage = error.response?.data?.detail || error.response?.data?.message || error.message || 'Error al procesar inscripción';
-      alert(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
+      let errorMessage = 'Error al procesar inscripción';
+      
+      if (error.response?.data?.detail) {
+        const detail = error.response.data.detail;
+        if (typeof detail === 'string') {
+          errorMessage = detail;
+        } else if (Array.isArray(detail)) {
+          // Pydantic validation errors come as array
+          const fieldErrors = detail.map(err => {
+            const field = err.loc?.slice(-1)[0] || 'campo';
+            const fieldNames = {
+              'nombre': 'Nombre',
+              'apellido': 'Apellido', 
+              'cedula': 'Cédula',
+              'numero_competicion': 'Número de competición',
+              'celular': 'Celular',
+              'correo': 'Correo',
+              'categorias': 'Categorías'
+            };
+            const friendlyField = fieldNames[field] || field;
+            
+            if (err.type === 'string_too_short') {
+              const minLen = err.ctx?.min_length || 0;
+              return `${friendlyField} debe tener al menos ${minLen} caracteres`;
+            }
+            return `${friendlyField}: ${err.msg}`;
+          });
+          errorMessage = fieldErrors.join('\n');
+        } else if (typeof detail === 'object') {
+          errorMessage = detail.message || JSON.stringify(detail);
+        }
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
