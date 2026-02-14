@@ -260,7 +260,7 @@ def send_email(to: str, subject: str, html: str, cc: Optional[str] = None):
         }
         
         payload = {
-            "from": "Super GP Corona <inscripciones@vittalix.com>",
+            "from": "Super GP Corona <coronaclubxp@vittalix.com>",
             "to": [to],
             "subject": subject,
             "html": html
