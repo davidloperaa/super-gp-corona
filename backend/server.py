@@ -290,82 +290,169 @@ def send_email(to: str, subject: str, html: str, cc: Optional[str] = None):
         logging.error(f"Error sending email: {str(e)}")
         return False
 
+def generate_qr_url(registration_id: str, secret_key: str) -> str:
+    """Generate a QR code URL using quickchart.io service (compatible with email clients)"""
+    import urllib.parse
+    verification_hash = hashlib.sha256(
+        f"{registration_id}{secret_key}".encode()
+    ).hexdigest()[:16]
+    qr_data = f"{registration_id}|{verification_hash}"
+    encoded_data = urllib.parse.quote(qr_data)
+    return f"https://quickchart.io/qr?text={encoded_data}&size=200&dark=000000&light=ffffff"
+
 def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
-    qr_section = ""
-    if qr_code:
-        qr_section = f"""
-        <div style="text-align: center; margin: 30px 0; padding: 20px; background: white; border: 3px dashed #00CED1;">
-            <h3 style="color: #000; margin-bottom: 15px;">Tu Código QR de Acceso</h3>
-            <img src="{qr_code}" alt="QR Code" style="max-width: 250px; height: auto;" />
-            <p style="color: #666; font-size: 14px; margin-top: 10px;">Presenta este QR el día del evento para tu check-in</p>
-        </div>
-        """
+    # Generate QR URL for email (quickchart.io is compatible with all email clients)
+    qr_url = generate_qr_url(registration['id'], JWT_SECRET)
+    
+    categories_html = ''.join([f'<tr><td style="padding: 5px 10px; color: #333333; font-size: 14px;">• {cat}</td></tr>' for cat in registration['categorias']])
     
     return f"""
     <!DOCTYPE html>
     <html>
     <head>
-        <style>
-            body {{ font-family: Arial, sans-serif; background: #050505; color: #EDEDED; }}
-            .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-            .header {{ background: #FF0000; padding: 30px; text-align: center; }}
-            .header h1 {{ color: white; margin: 0; font-size: 32px; }}
-            .content {{ background: #121212; padding: 30px; border: 1px solid #333; }}
-            .info-row {{ margin: 15px 0; padding: 10px; border-left: 3px solid #00CED1; }}
-            .label {{ color: #00CED1; font-weight: bold; }}
-            .footer {{ text-align: center; padding: 20px; color: #666; }}
-        </style>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>🏍️ INSCRIPCIÓN CONFIRMADA</h1>
-                <p style="color: white;">Campeonato Interligas Super GP Corona XP 2026</p>
-            </div>
-            <div class="content">
-                <h2 style="color: #FF0000;">¡Bienvenido al campeonato!</h2>
-                <p>Estimado/a {registration['nombre']} {registration['apellido']},</p>
-                <p>Tu inscripción ha sido confirmada exitosamente para el Campeonato Interligas Super GP Corona XP 2026.</p>
-                
-                {qr_section}
-                
-                <h3 style="color: #00CED1;">Detalles de tu inscripción:</h3>
-                <div class="info-row">
-                    <span class="label">ID de Inscripción:</span> {registration['id']}
-                </div>
-                <div class="info-row">
-                    <span class="label">Número de Competición:</span> #{registration['numero_competicion']}
-                </div>
-                <div class="info-row">
-                    <span class="label">Cédula:</span> {registration['cedula']}
-                </div>
-                <div class="info-row">
-                    <span class="label">Categorías:</span><br>
-                    {'<br>'.join(['• ' + cat for cat in registration['categorias']])}
-                </div>
-                <div class="info-row">
-                    <span class="label">Precio Total:</span> COP {registration['precio_final']:,.0f}
-                </div>
-                <div class="info-row">
-                    <span class="label">Estado de Pago:</span> {registration['estado_pago'].upper()}
-                </div>
-                
-                <h3 style="color: #00CED1;">Información del Evento:</h3>
-                <p><strong>📅 Fechas:</strong> 27, 28 de Febrero y 1 de Marzo 2026</p>
-                <p><strong>📍 Ubicación:</strong> Corona Club XP, Avenida Panamericana Km 9 El Cofre, Popayán</p>
-                
-                <div style="background: #FF0000; padding: 15px; margin: 20px 0; border-radius: 5px;">
-                    <p style="margin: 0; color: white; font-weight: bold;">⚠️ IMPORTANTE: Lleva tu QR code impreso o en tu celular el día del evento</p>
-                </div>
-                
-                <p style="margin-top: 30px;">Para cualquier consulta, contáctanos en <a href="mailto:inscripciones@coronaclubxp.com" style="color: #00CED1;">inscripciones@coronaclubxp.com</a></p>
-                
-                <p style="margin-top: 20px; color: #FF0000; font-weight: bold;">¡Nos vemos en la pista! 🏁</p>
-            </div>
-            <div class="footer">
-                <p>© 2026 Corona Club XP - Campeonato Interligas Super GP</p>
-            </div>
-        </div>
+    <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f4f4f4;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f4f4;">
+            <tr>
+                <td align="center" style="padding: 20px 10px;">
+                    <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; max-width: 600px;">
+                        
+                        <!-- Header -->
+                        <tr>
+                            <td style="background-color: #DC2626; padding: 30px 20px; text-align: center;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">INSCRIPCIÓN CONFIRMADA</h1>
+                                <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px;">Campeonato Interligas Super GP Corona XP 2026</p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Welcome -->
+                        <tr>
+                            <td style="padding: 30px 30px 20px 30px;">
+                                <h2 style="margin: 0 0 15px 0; color: #DC2626; font-size: 22px;">¡Bienvenido al campeonato!</h2>
+                                <p style="margin: 0 0 10px 0; color: #333333; font-size: 16px; line-height: 1.5;">
+                                    Estimado/a <strong>{registration['nombre']} {registration['apellido']}</strong>,
+                                </p>
+                                <p style="margin: 0; color: #333333; font-size: 16px; line-height: 1.5;">
+                                    Tu inscripción ha sido confirmada exitosamente para el Campeonato Interligas Super GP Corona XP 2026.
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <!-- QR Code Section -->
+                        <tr>
+                            <td style="padding: 0 30px 20px 30px;">
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f8f9fa; border: 2px dashed #10B981; border-radius: 8px;">
+                                    <tr>
+                                        <td style="padding: 25px; text-align: center;">
+                                            <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px; font-weight: bold;">Tu Código QR de Acceso</h3>
+                                            <img src="{qr_url}" alt="Código QR" width="200" height="200" style="display: block; margin: 0 auto; border: 4px solid #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                                            <p style="margin: 15px 0 0 0; color: #666666; font-size: 14px;">Presenta este QR el día del evento para tu check-in</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        
+                        <!-- Details Section -->
+                        <tr>
+                            <td style="padding: 0 30px 20px 30px;">
+                                <h3 style="margin: 0 0 15px 0; color: #10B981; font-size: 18px; border-bottom: 2px solid #10B981; padding-bottom: 10px;">Detalles de tu inscripción</h3>
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                    <tr>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #eeeeee;">
+                                            <strong style="color: #10B981;">ID de Inscripción:</strong>
+                                            <span style="color: #333333; margin-left: 10px;">{registration['id']}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #eeeeee;">
+                                            <strong style="color: #10B981;">Número de Competición:</strong>
+                                            <span style="color: #333333; margin-left: 10px; font-weight: bold; font-size: 18px;">#{registration['numero_competicion']}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #eeeeee;">
+                                            <strong style="color: #10B981;">Cédula:</strong>
+                                            <span style="color: #333333; margin-left: 10px;">{registration['cedula']}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #eeeeee;">
+                                            <strong style="color: #10B981;">Categorías:</strong>
+                                        </td>
+                                    </tr>
+                                    {categories_html}
+                                    <tr>
+                                        <td style="padding: 8px 0; border-bottom: 1px solid #eeeeee;">
+                                            <strong style="color: #10B981;">Precio Total:</strong>
+                                            <span style="color: #333333; margin-left: 10px; font-weight: bold;">COP {registration['precio_final']:,.0f}</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;">
+                                            <strong style="color: #10B981;">Estado de Pago:</strong>
+                                            <span style="color: #ffffff; margin-left: 10px; background-color: #10B981; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 12px;">{registration['estado_pago'].upper()}</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        
+                        <!-- Event Info -->
+                        <tr>
+                            <td style="padding: 0 30px 20px 30px;">
+                                <h3 style="margin: 0 0 15px 0; color: #10B981; font-size: 18px; border-bottom: 2px solid #10B981; padding-bottom: 10px;">Información del Evento</h3>
+                                <p style="margin: 0 0 8px 0; color: #333333; font-size: 15px;">
+                                    <strong>Fechas:</strong> 27, 28 de Febrero y 1 de Marzo 2026
+                                </p>
+                                <p style="margin: 0; color: #333333; font-size: 15px;">
+                                    <strong>Ubicación:</strong> Corona Club XP, Avenida Panamericana Km 9 El Cofre, Popayán
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Important Notice -->
+                        <tr>
+                            <td style="padding: 0 30px 20px 30px;">
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #DC2626; border-radius: 8px;">
+                                    <tr>
+                                        <td style="padding: 15px 20px; text-align: center;">
+                                            <p style="margin: 0; color: #ffffff; font-size: 14px; font-weight: bold;">
+                                                ⚠️ IMPORTANTE: Lleva tu QR code impreso o en tu celular el día del evento
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        
+                        <!-- Contact -->
+                        <tr>
+                            <td style="padding: 0 30px 30px 30px;">
+                                <p style="margin: 0 0 15px 0; color: #333333; font-size: 14px;">
+                                    Para cualquier consulta, contáctanos en <a href="mailto:inscripcionescorona@gmail.com" style="color: #10B981; text-decoration: none; font-weight: bold;">inscripcionescorona@gmail.com</a>
+                                </p>
+                                <p style="margin: 0; color: #DC2626; font-size: 16px; font-weight: bold;">
+                                    ¡Nos vemos en la pista! 🏁
+                                </p>
+                            </td>
+                        </tr>
+                        
+                        <!-- Footer -->
+                        <tr>
+                            <td style="background-color: #1a1a1a; padding: 20px 30px; text-align: center;">
+                                <p style="margin: 0; color: #999999; font-size: 12px;">
+                                    © 2026 Corona Club XP - Campeonato Interligas Super GP
+                                </p>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </td>
+            </tr>
+        </table>
     </body>
     </html>
     """
