@@ -123,3 +123,11 @@ Sitio web moderno y dinámico para un evento de carreras de motocicletas, con si
 - QR Code usando QuickChart.io (compatible con Gmail, Outlook, etc.)
 - Email de contacto actualizado a inscripcionescorona@gmail.com
 - CSS 100% inline para máxima compatibilidad
+
+### 2025-02-14 - Mejoras Panel de Administración
+- Galería pública ahora carga desde base de datos
+- Calendario público ahora carga desde API
+- AdminNavbar agregado a todas las páginas admin
+- Botón "Vista Previa" en Configuración, Galería y Calendario
+- Nueva página /admin/calendario para gestionar días/actividades/disciplinas
+- Endpoints: GET /api/calendar, PUT /api/admin/calendar
