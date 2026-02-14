@@ -15,6 +15,9 @@ export const AdminRegistrations = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
+  const [deleteAllType, setDeleteAllType] = useState(null); // 'all', 'pendiente', 'completado'
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
