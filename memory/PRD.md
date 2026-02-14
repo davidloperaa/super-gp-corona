@@ -112,8 +112,14 @@ Sitio web moderno y dinámico para un evento de carreras de motocicletas, con si
 
 ## Changelog
 
-### 2025-12-XX - Fix Validación de Celular
+### 2025-02-14 - Fix Validación de Celular
 - Agregada validación frontend para celular (mínimo 10 dígitos)
 - Indicador visual de contador de dígitos
 - Mejor manejo de errores de validación del backend
 - Mensajes de error traducidos a español
+
+### 2025-02-14 - Rediseño Email de Confirmación
+- Plantilla con fondo blanco y texto oscuro (alto contraste)
+- QR Code usando QuickChart.io (compatible con Gmail, Outlook, etc.)
+- Email de contacto actualizado a inscripcionescorona@gmail.com
+- CSS 100% inline para máxima compatibilidad
