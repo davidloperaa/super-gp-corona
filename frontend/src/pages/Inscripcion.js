@@ -154,7 +154,9 @@ export const Inscripcion = () => {
         window.location.href = paymentResponse.data.init_point;
       }
     } catch (error) {
-      alert(error.response?.data?.detail || 'Error al procesar inscripción');
+      console.error('Error:', error);
+      const errorMessage = error.response?.data?.detail || error.response?.data?.message || error.message || 'Error al procesar inscripción';
+      alert(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
     } finally {
       setLoading(false);
     }
