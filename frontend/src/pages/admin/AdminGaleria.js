@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
   Image, Upload, Trash2, GripVertical, X, Plus, Save, 
-  AlertCircle, CheckCircle
+  AlertCircle, CheckCircle, ExternalLink
 } from 'lucide-react';
 import { AdminNavbar } from '../../components/AdminNavbar';
 
@@ -149,6 +149,14 @@ export const AdminGaleria = () => {
           <h1 className="font-heading text-4xl font-black uppercase text-glow-red">
             GESTIÓN DE GALERÍA
           </h1>
+          <button
+            onClick={() => window.open('/galeria', '_blank')}
+            className="flex items-center space-x-2 bg-surface text-white font-heading font-bold uppercase px-4 py-3 border border-white/20 hover:border-secondary transition-colors"
+            data-testid="preview-galeria-btn"
+          >
+            <ExternalLink className="w-5 h-5" />
+            <span>Vista Previa</span>
+          </button>
         </div>
 
         {message.text && (
