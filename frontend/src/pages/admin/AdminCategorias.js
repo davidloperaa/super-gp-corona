@@ -345,5 +345,6 @@ export const AdminCategorias = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
