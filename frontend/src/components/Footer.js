@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Instagram, Facebook, MapPin, Mail, Phone } from 'lucide-react';
+import { Trophy, Instagram, Facebook, MapPin, Mail, Phone, Shield, UserCog } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSettings } from '../context/SettingsContext';
 
@@ -53,7 +53,7 @@ export const Footer = () => {
 
           <div>
             <h4 className="font-heading text-white font-bold mb-4 uppercase">Síguenos</h4>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 mb-6">
               <a
                 href={settings.instagram_url}
                 target="_blank"
@@ -72,6 +72,26 @@ export const Footer = () => {
               >
                 <Facebook className="w-5 h-5" />
               </a>
+            </div>
+            
+            <h4 className="font-heading text-white font-bold mb-3 uppercase text-sm">Acceso</h4>
+            <div className="flex flex-col space-y-2">
+              <Link
+                to="/admin/login"
+                className="flex items-center space-x-2 text-white/50 hover:text-primary transition-colors text-sm"
+                data-testid="link-admin-login"
+              >
+                <UserCog className="w-4 h-4" />
+                <span>Panel Admin</span>
+              </Link>
+              <Link
+                to="/superadmin/login"
+                className="flex items-center space-x-2 text-white/50 hover:text-secondary transition-colors text-sm"
+                data-testid="link-superadmin-login"
+              >
+                <Shield className="w-4 h-4" />
+                <span>Super Admin</span>
+              </Link>
             </div>
           </div>
         </div>
