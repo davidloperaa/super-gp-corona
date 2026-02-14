@@ -175,5 +175,6 @@ export const AdminCoupons = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
