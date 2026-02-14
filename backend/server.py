@@ -529,7 +529,10 @@ async def get_mercadopago_public_key():
 async def get_categories():
     categories = await get_categories_from_db()
     prices = await get_category_prices()
-    return {"categorias": categories, "precios": prices}
+    # Get category groups
+    groups_doc = await db.category_groups.find_one({"_id": "groups"})
+    groups = groups_doc.get("groups", {}) if groups_doc else {}
+    return {"categorias": categories, "precios": prices, "grupos": groups}
 
 @api_router.post("/registrations/calculate")
 async def calculate_registration_price(data: dict):
