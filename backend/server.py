@@ -19,6 +19,7 @@ import requests
 import hashlib
 import base64
 import shutil
+import urllib.parse
 from qr_service import generate_qr_code, verify_qr_code
 from models import (
     SiteSettings, SettingsUpdate, QRScanRequest, CheckInRequest,
