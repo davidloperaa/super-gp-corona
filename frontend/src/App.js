@@ -53,6 +53,7 @@ function App() {
           <Route path="/admin/coupons" element={<AdminCoupons />} />
           <Route path="/admin/news" element={<AdminNews />} />
           <Route path="/admin/precios" element={<AdminPrecios />} />
+          <Route path="/admin/categorias" element={<AdminCategorias />} />
           <Route path="/admin/contenido" element={<AdminContenido />} />
           <Route path="/admin/configuracion" element={<AdminConfiguracion />} />
           <Route path="/admin/asistencia" element={<AdminAsistencia />} />
