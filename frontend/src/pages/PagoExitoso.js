@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { CheckCircle, Mail } from 'lucide-react';
+import { CheckCircle, Mail, RefreshCw } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -11,21 +11,45 @@ export const PagoExitoso = () => {
   const registrationId = searchParams.get('registration_id');
   const [registration, setRegistration] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [verifying, setVerifying] = useState(false);
+  const [paymentVerified, setPaymentVerified] = useState(false);
 
   useEffect(() => {
     if (registrationId) {
-      fetchRegistration();
+      verifyAndFetchRegistration();
     }
   }, [registrationId]);
 
-  const fetchRegistration = async () => {
+  const verifyAndFetchRegistration = async () => {
     try {
+      // First, verify the payment with MercadoPago
+      setVerifying(true);
+      const verifyResponse = await axios.post(`${API}/payments/verify/${registrationId}`);
+      setPaymentVerified(verifyResponse.data.status === 'completed');
+      
+      // Then fetch the updated registration
       const response = await axios.get(`${API}/registrations/${registrationId}`);
       setRegistration(response.data);
     } catch (error) {
-      console.error('Error fetching registration:', error);
+      console.error('Error:', error);
     } finally {
       setLoading(false);
+      setVerifying(false);
+    }
+  };
+
+  const handleRetryVerification = async () => {
+    setVerifying(true);
+    try {
+      const verifyResponse = await axios.post(`${API}/payments/verify/${registrationId}`);
+      setPaymentVerified(verifyResponse.data.status === 'completed');
+      
+      const response = await axios.get(`${API}/registrations/${registrationId}`);
+      setRegistration(response.data);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setVerifying(false);
     }
   };
 
