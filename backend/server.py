@@ -518,11 +518,12 @@ async def create_payment_preference(data: dict):
         "back_urls": {
             "success": f"{FRONTEND_URL}/pago-exitoso?registration_id={registration_id}",
             "failure": f"{FRONTEND_URL}/pago-fallido?registration_id={registration_id}",
-            "pending": f"{FRONTEND_URL}/pago-pendiente?registration_id={registration_id}"
+            "pending": f"{FRONTEND_URL}/pago-exitoso?registration_id={registration_id}&status=pending"
         },
         "auto_return": "approved",
         "external_reference": registration_id,
-        "notification_url": f"{FRONTEND_URL}/api/webhooks/mercadopago"
+        "statement_descriptor": "SUPER GP CORONA",
+        "binary_mode": False
     }
     
     try:
