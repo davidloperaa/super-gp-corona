@@ -370,37 +370,60 @@ export const Inscripcion = () => {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-2">
-                {categorias.map((categoria, index) => (
-                  <div
-                    key={index}
-                    data-testid={`categoria-checkbox-${index}`}
-                    onClick={() => handleCategoriaToggle(categoria)}
-                    className={`p-4 border-2 cursor-pointer transition-all ${
-                      formData.categorias.includes(categoria)
-                        ? 'border-primary bg-primary/10'
-                        : 'border-white/20 hover:border-white/40'
-                    }`}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div
-                        className={`w-5 h-5 border-2 flex items-center justify-center mt-0.5 ${
-                          formData.categorias.includes(categoria)
-                            ? 'border-primary bg-primary'
-                            : 'border-white/40'
-                        }`}
-                      >
-                        {formData.categorias.includes(categoria) && <Check className="w-3 h-3 text-white" />}
+              <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-6">
+                {['VELOCIDAD TOP', 'VELOCIDAD', 'VELOCIDAD RECREATIVAS', 'KARTS', 'VELOTIERRA', 'MOTOCROSS'].map((groupName) => {
+                  const groupCats = grupos[groupName] || [];
+                  if (groupCats.length === 0) return null;
+                  
+                  const groupColors = {
+                    'VELOCIDAD TOP': 'border-primary bg-primary/20 text-primary',
+                    'VELOCIDAD': 'border-secondary bg-secondary/20 text-secondary',
+                    'VELOCIDAD RECREATIVAS': 'border-accent bg-accent/20 text-accent',
+                    'KARTS': 'border-warning bg-warning/20 text-warning',
+                    'VELOTIERRA': 'border-orange-500 bg-orange-500/20 text-orange-500',
+                    'MOTOCROSS': 'border-green-500 bg-green-500/20 text-green-500'
+                  };
+                  
+                  return (
+                    <div key={groupName} className="mb-4">
+                      <div className={`${groupColors[groupName]} border-l-4 px-4 py-2 mb-3`}>
+                        <h3 className="font-heading font-bold uppercase text-sm">{groupName}</h3>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-heading font-bold text-sm">{categoria}</p>
-                        <p className="text-white/70 text-xs mt-1">
-                          COP {precios[categoria]?.toLocaleString() || '0'}
-                        </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {groupCats.map((categoria, index) => (
+                          <div
+                            key={`${groupName}-${index}`}
+                            data-testid={`categoria-checkbox-${groupName}-${index}`}
+                            onClick={() => handleCategoriaToggle(categoria)}
+                            className={`p-3 border-2 cursor-pointer transition-all ${
+                              formData.categorias.includes(categoria)
+                                ? 'border-primary bg-primary/10'
+                                : 'border-white/20 hover:border-white/40'
+                            }`}
+                          >
+                            <div className="flex items-start space-x-3">
+                              <div
+                                className={`w-5 h-5 border-2 flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                                  formData.categorias.includes(categoria)
+                                    ? 'border-primary bg-primary'
+                                    : 'border-white/40'
+                                }`}
+                              >
+                                {formData.categorias.includes(categoria) && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-heading font-bold text-sm truncate">{categoria}</p>
+                                <p className="text-white/70 text-xs mt-1">
+                                  COP {precios[categoria]?.toLocaleString() || '100.000'}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
