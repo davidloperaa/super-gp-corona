@@ -85,7 +85,7 @@ export const Home = () => {
             <div className="bg-black/50 border border-white/10 p-8 hover:border-primary/50 transition-colors group" data-testid="feature-card-1">
               <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <Trophy className="w-12 h-12 text-primary mb-4" />
-              <h3 className="font-heading text-2xl font-bold uppercase mb-3">32 Categorías</h3>
+              <h3 className="font-heading text-2xl font-bold uppercase mb-3">28 Categorías</h3>
               <p className="text-white/70">
                 Desde infantil hasta alto cilindraje. Encuentra tu categoría y compite con los mejores.
               </p>
@@ -132,7 +132,7 @@ export const Home = () => {
                 </li>
                 <li className="flex items-center space-x-3">
                   <Trophy className="w-5 h-5 text-primary" />
-                  <span className="text-white">32 categorías diferentes</span>
+                  <span className="text-white">28 categorías diferentes</span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <Flag className="w-5 h-5 text-primary" />
