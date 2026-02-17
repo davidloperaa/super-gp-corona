@@ -22,8 +22,8 @@ export const Navbar = () => {
           <Link to="/" className="flex items-center space-x-3" data-testid="nav-logo">
             <Trophy className="w-8 h-8 text-primary" />
             <div className="flex flex-col">
-              <span className="font-heading text-xl font-black uppercase text-glow-red">SUPER GP</span>
-              <span className="font-heading text-xs text-secondary">CORONA XP 2026</span>
+              <span className="font-heading text-sm font-black uppercase text-glow-red leading-tight">CAMPEONATO INTERLIGAS</span>
+              <span className="font-heading text-xs text-secondary leading-tight">SUPER GP CORONA XP</span>
             </div>
           </Link>
 
