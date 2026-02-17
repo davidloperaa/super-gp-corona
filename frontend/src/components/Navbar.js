@@ -23,7 +23,7 @@ export const Navbar = () => {
             <Trophy className="w-8 h-8 text-primary" />
             <div className="flex flex-col">
               <span className="font-heading text-sm font-black uppercase text-glow-red leading-tight">CAMPEONATO INTERLIGAS</span>
-              <span className="font-heading text-xs text-secondary leading-tight">SUPER GP CORONA XP</span>
+              <span className="font-heading text-xs text-secondary leading-tight">SUPER GP CORONA CLUB XP</span>
             </div>
           </Link>
 
