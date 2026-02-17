@@ -90,7 +90,7 @@ export const Categorias = () => {
             CATEGORÍAS
           </h1>
           <p className="text-white/80 text-lg max-w-2xl mx-auto">
-            30 categorías disponibles para todos los niveles. Encuentra la tuya y prepárate para competir.
+            28 categorías disponibles para todos los niveles. Encuentra la tuya y prepárate para competir.
           </p>
         </div>
 

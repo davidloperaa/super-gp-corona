@@ -27,7 +27,7 @@ export const SettingsProvider = ({ children }) => {
     event_location: 'Corona Club XP, Popayán',
     hero_title: 'CAMPEONATO INTERLIGAS',
     hero_subtitle: 'SUPER GP',
-    hero_description: 'Vive la emoción del motociclismo extremo. 32 categorías, 3 días de competencia, adrenalina sin límites.',
+    hero_description: 'Vive la emoción del motociclismo extremo. 28 categorías, 3 días de competencia, adrenalina sin límites.',
     footer_text: '© 2026 Corona Club XP. Todos los derechos reservados.',
     footer_email: 'contacto@coronaclubxp.com',
     footer_phone: '+57 300 123 4567',
