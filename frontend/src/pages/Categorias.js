@@ -171,10 +171,7 @@ export const Categorias = () => {
               <p className="text-white/70 text-sm">Hasta Sábado 28 Feb</p>
             </div>
           </div>
-          <p className="text-center text-white/70">
-            <span className="text-warning">⚠️</span> Excepción: Pilotos LICAMO: $40.000 (precio fijo)
-          </p>
-          <p className="text-center text-white/50 text-sm mt-2">
+          <p className="text-center text-white/50 text-sm">
             Devoluciones con excusa hasta el Viernes 27 de Febrero
           </p>
         </div>
