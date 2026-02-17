@@ -1086,7 +1086,7 @@ async def get_content():
 DEFAULT_CALENDAR = [
     {
         "id": "dia-1",
-        "dia": "Jueves 27",
+        "dia": "Viernes 27",
         "fecha": "27 de Febrero 2026",
         "actividades": [
             {"hora": "19:00", "titulo": "Aguapanelazo", "descripcion": "Recepción y acreditación de pilotos"}
@@ -1094,7 +1094,7 @@ DEFAULT_CALENDAR = [
     },
     {
         "id": "dia-2", 
-        "dia": "Viernes 28",
+        "dia": "Sábado 28",
         "fecha": "28 de Febrero 2026",
         "actividades": [
             {"hora": "09:00 - 18:00", "titulo": "Entrenamientos", "descripcion": "Sesión de entrenamientos libres todas las categorías"},
@@ -1103,7 +1103,7 @@ DEFAULT_CALENDAR = [
     },
     {
         "id": "dia-3",
-        "dia": "Sábado 1",
+        "dia": "Domingo 1",
         "fecha": "1 de Marzo 2026",
         "actividades": [
             {"hora": "08:00 - 17:00", "titulo": "CARRERAS", "descripcion": "Carreras - Todas las categorías"},
