@@ -937,7 +937,7 @@ async def update_category(old_name: str, category: CategoryUpdate, payload: dict
         if category.nombre in categories:
             raise HTTPException(status_code=400, detail="El nuevo nombre ya existe")
         
-        # Replace old name with new name
+        # Replace old name with new name in categories list
         index = categories.index(old_name)
         categories[index] = category.nombre
         await db.categories.update_one(
@@ -955,6 +955,23 @@ async def update_category(old_name: str, category: CategoryUpdate, payload: dict
             {"$set": {"prices": prices}},
             upsert=True
         )
+        
+        # Update category name in groups
+        groups_doc = await db.category_groups.find_one({"_id": "groups"})
+        if groups_doc and groups_doc.get("groups"):
+            groups = groups_doc["groups"]
+            updated = False
+            for group_name, group_cats in groups.items():
+                if old_name in group_cats:
+                    idx = group_cats.index(old_name)
+                    group_cats[idx] = category.nombre
+                    updated = True
+            if updated:
+                await db.category_groups.update_one(
+                    {"_id": "groups"},
+                    {"$set": {"groups": groups}},
+                    upsert=True
+                )
     else:
         # Just update price
         await update_category_price(category.nombre, category.precio)
