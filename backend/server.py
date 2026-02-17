@@ -1004,6 +1004,22 @@ async def delete_category(nombre: str, payload: dict = Depends(verify_token)):
             upsert=True
         )
     
+    # Remove from groups
+    groups_doc = await db.category_groups.find_one({"_id": "groups"})
+    if groups_doc and groups_doc.get("groups"):
+        groups = groups_doc["groups"]
+        updated = False
+        for group_name, group_cats in groups.items():
+            if nombre in group_cats:
+                group_cats.remove(nombre)
+                updated = True
+        if updated:
+            await db.category_groups.update_one(
+                {"_id": "groups"},
+                {"$set": {"groups": groups}},
+                upsert=True
+            )
+    
     return {"message": "Categoría eliminada exitosamente"}
 
 @api_router.put("/admin/category-groups")
