@@ -11,6 +11,8 @@ import { Inscripcion } from './pages/Inscripcion';
 import { Noticias } from './pages/Noticias';
 import { PagoExitoso } from './pages/PagoExitoso';
 import { PagoFallido } from './pages/PagoFallido';
+import { ConfirmacionPreinscripcion } from './pages/ConfirmacionPreinscripcion';
+import { TerminosCondiciones } from './pages/TerminosCondiciones';
 import { AdminLogin } from './pages/admin/AdminLogin';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminRegistrations } from './pages/admin/AdminRegistrations';
@@ -44,6 +46,8 @@ function App() {
           <Route path="/inscripcion" element={<Inscripcion />} />
           <Route path="/inscripciones" element={<Inscripcion />} />
           <Route path="/noticias" element={<Noticias />} />
+          <Route path="/terminos-y-condiciones" element={<TerminosCondiciones />} />
+          <Route path="/confirmacion-preinscripcion" element={<ConfirmacionPreinscripcion />} />
           
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
           <Route path="/pago-fallido" element={<PagoFallido />} />
