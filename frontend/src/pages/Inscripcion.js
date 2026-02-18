@@ -143,6 +143,11 @@ export const Inscripcion = () => {
 
   const handleSubmit = async () => {
     if (!validateStep()) return;
+    
+    if (!aceptaTerminos) {
+      alert('Debes aceptar los Términos y Condiciones para continuar');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -153,16 +158,8 @@ export const Inscripcion = () => {
 
       const registration = response.data;
       
-      if (registration.precio_final === 0) {
-        alert(`¡Inscripción completada! Cupón 100% aplicado. Recibirás confirmación por email.`);
-        navigate('/pago-exitoso?registration_id=' + registration.id);
-      } else {
-        const paymentResponse = await axios.post(`${API}/payments/create-preference`, {
-          registration_id: registration.id
-        });
-        
-        window.location.href = paymentResponse.data.init_point;
-      }
+      // Redirect to pre-registration confirmation page
+      navigate('/confirmacion-preinscripcion?registration_id=' + registration.id);
     } catch (error) {
       console.error('Error:', error);
       let errorMessage = 'Error al procesar inscripción';
