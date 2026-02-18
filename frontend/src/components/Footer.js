@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Instagram, Facebook, MapPin, Mail, Phone, Shield, UserCog } from 'lucide-react';
+import { Trophy, Instagram, Facebook, MapPin, Mail, Phone, Shield, UserCog, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSettings } from '../context/SettingsContext';
 
@@ -15,7 +15,7 @@ export const Footer = () => {
               <Trophy className="w-8 h-8 text-primary" />
               <div>
                 <h3 className="font-heading text-lg font-black text-glow-red">SUPER GP</h3>
-                <p className="text-secondary text-sm">Corona XP 2026</p>
+                <p className="text-secondary text-sm">Corona Club XP 2026</p>
               </div>
             </div>
             <p className="text-white/70 text-sm">
@@ -30,6 +30,12 @@ export const Footer = () => {
               <li><Link to="/calendario" className="text-white/70 hover:text-secondary transition-colors">Calendario</Link></li>
               <li><Link to="/inscripcion" className="text-white/70 hover:text-secondary transition-colors">Inscripciones</Link></li>
               <li><Link to="/noticias" className="text-white/70 hover:text-secondary transition-colors">Noticias</Link></li>
+              <li>
+                <Link to="/terminos-y-condiciones" className="text-white/70 hover:text-secondary transition-colors flex items-center space-x-1">
+                  <FileText className="w-3 h-3" />
+                  <span>Términos y Condiciones</span>
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -37,16 +43,16 @@ export const Footer = () => {
             <h4 className="font-heading text-white font-bold mb-4 uppercase">Contacto</h4>
             <ul className="space-y-2 text-white/70 text-sm">
               <li className="flex items-center space-x-2">
-                <MapPin className="w-4 h-4" />
-                <span>{settings.footer_address}</span>
+                <MapPin className="w-4 h-4 flex-shrink-0" />
+                <span>SEC EL COFRE KM NUEVE VIA POPAYAN-CALI</span>
               </li>
               <li className="flex items-center space-x-2">
-                <Mail className="w-4 h-4" />
-                <span>{settings.footer_email}</span>
+                <Mail className="w-4 h-4 flex-shrink-0" />
+                <span>coronaclubxtreme@gmail.com</span>
               </li>
               <li className="flex items-center space-x-2">
-                <Phone className="w-4 h-4" />
-                <span>{settings.footer_phone}</span>
+                <Phone className="w-4 h-4 flex-shrink-0" />
+                <span>3104223288</span>
               </li>
             </ul>
           </div>
@@ -96,8 +102,21 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-8 pt-8 text-center text-white/50 text-sm">
-          <p>{settings.footer_text}</p>
+        {/* Legal Info */}
+        <div className="border-t border-white/10 mt-8 pt-6">
+          <div className="text-center text-white/60 text-sm space-y-1">
+            <p className="font-semibold text-white/80">Carlos Alberto Alarcón Flórez</p>
+            <p>NIT: 10306883 | Representante Legal</p>
+            <p>Dirección: SEC EL COFRE KM NUEVE VIA POPAYAN-CALI</p>
+            <p>Correo: coronaclubxtreme@gmail.com | Teléfono: 3104223288</p>
+            <Link to="/terminos-y-condiciones" className="text-secondary hover:text-secondary/80 transition-colors inline-block mt-2">
+              Ver Términos y Condiciones
+            </Link>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10 mt-6 pt-6 text-center text-white/50 text-sm">
+          <p>© 2026 Super GP Corona Club XP. Todos los derechos reservados.</p>
           <p className="mt-2 text-white/40">
             Página web realizada por <span className="text-secondary/70 font-semibold">Vitalaze LLC</span> - Cotiza ahora: <a href="tel:+573103844519" className="text-secondary/70 hover:text-secondary transition-colors">+57 310 384 4519</a>
           </p>
