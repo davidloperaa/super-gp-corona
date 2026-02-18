@@ -556,7 +556,7 @@ async def calculate_registration_price(data: dict):
 async def create_registration(reg: RegistrationCreate):
     precio_base, descuento, precio_final, fase, tipo_desc = await calculate_precio(reg.categorias, reg.codigo_cupon)
     
-    # Calculate commission
+    # Calculate commission (kept for record-keeping)
     comision, neto_evento = await calculate_commission(precio_final)
     
     registration = Registration(
@@ -574,7 +574,7 @@ async def create_registration(reg: RegistrationCreate):
         comision_plataforma=comision,
         neto_evento=neto_evento,
         codigo_cupon=reg.codigo_cupon,
-        estado_pago="pendiente" if precio_final > 0 else "completado"
+        estado_pago="pendiente_pago"  # Always pending - manual payment verification
     )
     
     qr_code = generate_qr_code(registration.id, JWT_SECRET)
@@ -582,6 +582,7 @@ async def create_registration(reg: RegistrationCreate):
     
     doc = registration.model_dump()
     doc['created_at'] = doc['created_at'].isoformat()
+    doc['fecha_preinscripcion'] = doc['created_at']  # Add pre-registration date
     if doc.get('check_in_time'):
         doc['check_in_time'] = doc['check_in_time'].isoformat()
     
@@ -593,76 +594,23 @@ async def create_registration(reg: RegistrationCreate):
             {"$inc": {"usos_actuales": 1}}
         )
     
-    if precio_final == 0:
-        email_html = generate_confirmation_email(doc, qr_code)
-        send_email(reg.correo, "Confirmación de Inscripción - Super GP Corona XP 2026", email_html, EMAIL_ADMIN)
+    # Note: Email will be sent after manual payment verification by admin
     
     return registration
 
+# MercadoPago endpoints DISABLED - Payment is now manual via Nequi transfer
 @api_router.post("/payments/create-preference")
 async def create_payment_preference(data: dict):
-    registration_id = data.get("registration_id")
-    
-    reg = await db.registrations.find_one({"id": registration_id})
-    if not reg:
-        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
-    
-    if reg.get("precio_final", 0) == 0:
-        raise HTTPException(status_code=400, detail="Esta inscripción no requiere pago")
-    
-    # Get dynamic MercadoPago configuration
-    mp_config = await get_event_mercadopago_config()
-    event_sdk = mercadopago.SDK(mp_config.get("mercadopago_access_token", MERCADOPAGO_ACCESS_TOKEN))
-    
-    preference_data = {
-        "items": [
-            {
-                "title": f"Inscripción Super GP - {reg['nombre']} {reg['apellido']}",
-                "quantity": 1,
-                "currency_id": "COP",
-                "unit_price": float(reg["precio_final"])
-            }
-        ],
-        "payer": {
-            "name": reg["nombre"],
-            "surname": reg["apellido"],
-            "email": reg["correo"],
-            "phone": {
-                "number": reg["celular"]
-            }
-        },
-        "back_urls": {
-            "success": f"{FRONTEND_URL}/pago-exitoso?registration_id={registration_id}",
-            "failure": f"{FRONTEND_URL}/pago-fallido?registration_id={registration_id}",
-            "pending": f"{FRONTEND_URL}/pago-exitoso?registration_id={registration_id}&status=pending"
-        },
-        "auto_return": "approved",
-        "external_reference": registration_id,
-        "statement_descriptor": "SUPER GP CORONA",
-        "binary_mode": False,
-        "notification_url": "https://corona-backend.dhvxzc.easypanel.host/api/webhooks/mercadopago"
-    }
-    
-    try:
-        preference_response = event_sdk.preference().create(preference_data)
-        preference = preference_response["response"]
-        
-        await db.registrations.update_one(
-            {"id": registration_id},
-            {"$set": {"mercadopago_preference_id": preference["id"]}}
-        )
-        
-        return {
-            "preference_id": preference["id"],
-            "init_point": preference["init_point"],
-            "sandbox_init_point": preference.get("sandbox_init_point")
-        }
-    except Exception as e:
-        logging.error(f"Error creating preference: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Error al crear preferencia de pago: {str(e)}")
+    """DISABLED - MercadoPago integration has been deactivated"""
+    raise HTTPException(
+        status_code=503, 
+        detail="El pago en línea está temporalmente deshabilitado. Por favor realiza tu pago por transferencia a Nequi: 3104223288"
+    )
 
 @api_router.post("/webhooks/mercadopago")
 async def mercadopago_webhook(request: Request):
+    """DISABLED - MercadoPago webhooks deactivated"""
+    return {"status": "disabled", "message": "MercadoPago integration is currently disabled"}
     try:
         data = await request.json()
         
