@@ -121,16 +121,17 @@ export const AdminDashboard = () => {
             </p>
           </div>
 
-          <div className="bg-surface border border-warning/50 p-6">
+          <div className="bg-surface border border-warning/50 p-6" data-testid="stat-cupones">
             <Ticket className="w-10 h-10 text-warning mb-3" />
             <p className="text-white/70 text-sm font-heading uppercase mb-1">Cupones Activos</p>
-            <p className="font-heading text-4xl font-black text-warning">-</p>
+            <p className="font-heading text-4xl font-black text-warning">{stats.cuponesActivos}</p>
+            <p className="text-white/50 text-xs mt-1">{stats.cuponesUsados} usos totales</p>
           </div>
 
-          <div className="bg-surface border border-accent/50 p-6">
+          <div className="bg-surface border border-accent/50 p-6" data-testid="stat-noticias">
             <Newspaper className="w-10 h-10 text-accent mb-3" />
             <p className="text-white/70 text-sm font-heading uppercase mb-1">Noticias</p>
-            <p className="font-heading text-4xl font-black text-accent">-</p>
+            <p className="font-heading text-4xl font-black text-accent">{stats.noticias}</p>
           </div>
         </div>
 
