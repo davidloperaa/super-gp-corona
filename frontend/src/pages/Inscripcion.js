@@ -505,7 +505,7 @@ export const Inscripcion = () => {
                       )}
                       <div className="border-t border-white/20 pt-2 mt-2">
                         <div className="flex justify-between text-xl">
-                          <span className="font-heading font-black uppercase">Total:</span>
+                          <span className="font-heading font-black uppercase">Total a Pagar:</span>
                           <span className="font-heading font-black text-primary">
                             COP {precioCalculado.precio_final.toLocaleString()}
                           </span>
@@ -517,6 +517,56 @@ export const Inscripcion = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Payment Info */}
+                <div className="bg-green-500/10 border border-green-500/30 p-6">
+                  <h3 className="font-heading font-bold text-green-400 mb-3">Información de Pago</h3>
+                  <p className="text-white/80 mb-2">
+                    El pago se realizará mediante transferencia a <strong className="text-green-400">Nequi: 3104223288</strong>
+                  </p>
+                  <p className="text-white/60 text-sm">
+                    Después de enviar el formulario, recibirás las instrucciones completas para confirmar tu inscripción.
+                  </p>
+                </div>
+
+                {/* Terms and Conditions Checkbox */}
+                <div className="bg-black/50 border border-white/10 p-6">
+                  <div 
+                    className="flex items-start space-x-3 cursor-pointer"
+                    onClick={() => setAceptaTerminos(!aceptaTerminos)}
+                  >
+                    <div
+                      data-testid="checkbox-terminos"
+                      className={`w-6 h-6 border-2 flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors ${
+                        aceptaTerminos
+                          ? 'border-secondary bg-secondary'
+                          : 'border-white/40 hover:border-white/60'
+                      }`}
+                    >
+                      {aceptaTerminos && <Check className="w-4 h-4 text-black" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white/90">
+                        He leído y acepto los{' '}
+                        <Link 
+                          to="/terminos-y-condiciones" 
+                          target="_blank"
+                          className="text-secondary hover:text-secondary/80 underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Términos y Condiciones
+                        </Link>
+                        , Política de Devolución y Cláusula de Exoneración de Responsabilidad.
+                      </p>
+                    </div>
+                  </div>
+                  {!aceptaTerminos && (
+                    <p className="text-warning text-sm mt-3 flex items-center space-x-2">
+                      <FileText className="w-4 h-4" />
+                      <span>Debes aceptar los términos para continuar</span>
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -545,9 +595,13 @@ export const Inscripcion = () => {
             ) : (
               <button
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || !aceptaTerminos}
                 data-testid="btn-submit"
-                className="ml-auto flex items-center space-x-2 bg-primary text-white font-heading font-black uppercase px-8 py-4 skew-racing hover:skew-x-0 transition-transform border-2 border-transparent hover:border-white disabled:opacity-50"
+                className={`ml-auto flex items-center space-x-2 font-heading font-black uppercase px-8 py-4 skew-racing hover:skew-x-0 transition-all border-2 ${
+                  aceptaTerminos 
+                    ? 'bg-primary text-white border-transparent hover:border-white' 
+                    : 'bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed'
+                }`}
               >
                 <span className="unskew flex items-center space-x-2">
                   {loading ? (
@@ -556,7 +610,7 @@ export const Inscripcion = () => {
                       <span>Procesando...</span>
                     </>
                   ) : (
-                    <span>Confirmar Inscripción</span>
+                    <span>Enviar Preinscripción</span>
                   )}
                 </span>
               </button>
