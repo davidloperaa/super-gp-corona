@@ -8,7 +8,13 @@ const API = `${BACKEND_URL}/api`;
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({ registrations: 0, totalRevenue: 0 });
+  const [stats, setStats] = useState({ 
+    registrations: 0, 
+    totalRevenue: 0,
+    cuponesActivos: 0,
+    cuponesUsados: 0,
+    noticias: 0
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,12 +28,43 @@ export const AdminDashboard = () => {
 
   const fetchStats = async (token) => {
     try {
-      const response = await axios.get(`${API}/registrations`, {
+      // Fetch registrations
+      const regResponse = await axios.get(`${API}/registrations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const registrations = response.data.registrations || [];
+      const registrations = regResponse.data.registrations || [];
       const totalRevenue = registrations.reduce((sum, reg) => sum + (reg.precio_final || 0), 0);
-      setStats({ registrations: registrations.length, totalRevenue });
+      
+      // Fetch coupons
+      let cuponesActivos = 0;
+      let cuponesUsados = 0;
+      try {
+        const couponsResponse = await axios.get(`${API}/admin/coupons`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const coupons = couponsResponse.data.coupons || [];
+        cuponesActivos = coupons.filter(c => c.activo).length;
+        cuponesUsados = coupons.reduce((sum, c) => sum + (c.usos_actuales || 0), 0);
+      } catch (e) {
+        console.error('Error fetching coupons:', e);
+      }
+      
+      // Fetch news
+      let noticias = 0;
+      try {
+        const newsResponse = await axios.get(`${API}/news`);
+        noticias = (newsResponse.data.news || newsResponse.data || []).length;
+      } catch (e) {
+        console.error('Error fetching news:', e);
+      }
+      
+      setStats({ 
+        registrations: registrations.length, 
+        totalRevenue,
+        cuponesActivos,
+        cuponesUsados,
+        noticias
+      });
     } catch (error) {
       console.error('Error fetching stats:', error);
       if (error.response?.status === 401) {
