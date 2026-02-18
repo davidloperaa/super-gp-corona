@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ChevronRight, ChevronLeft, Check, Loader } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ChevronRight, ChevronLeft, Check, Loader, FileText } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const STEPS = ['Datos Personales', 'Categorías', 'Resumen y Pago'];
+const STEPS = ['Datos Personales', 'Categorías', 'Resumen y Confirmación'];
 
 export const Inscripcion = () => {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ export const Inscripcion = () => {
   const [codigoCupon, setCodigoCupon] = useState('');
   const [cuponValido, setCuponValido] = useState(false);
   const [precioCalculado, setPrecioCalculado] = useState(null);
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
   
   const [formData, setFormData] = useState({
     nombre: '',
