@@ -147,34 +147,6 @@ export const Categorias = () => {
             );
           })}
         </div>
-
-        {/* Pricing Info */}
-        <div className="mt-16 bg-surface border border-white/10 p-8">
-          <h2 className="font-heading text-2xl font-bold uppercase mb-6 text-center text-glow-cyan">
-            Precios de Inscripción
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="bg-green-500/20 border border-green-500 p-4 text-center">
-              <p className="font-heading font-black text-2xl text-green-400">$100.000</p>
-              <p className="text-white/70 text-sm">Hasta Miércoles 18 Feb</p>
-            </div>
-            <div className="bg-yellow-500/20 border border-yellow-500 p-4 text-center">
-              <p className="font-heading font-black text-2xl text-yellow-400">$120.000</p>
-              <p className="text-white/70 text-sm">Hasta Lunes 23 Feb</p>
-            </div>
-            <div className="bg-orange-500/20 border border-orange-500 p-4 text-center">
-              <p className="font-heading font-black text-2xl text-orange-400">$144.000</p>
-              <p className="text-white/70 text-sm">Hasta Viernes 27 Feb 3PM</p>
-            </div>
-            <div className="bg-red-500/20 border border-red-500 p-4 text-center">
-              <p className="font-heading font-black text-2xl text-red-400">$173.000</p>
-              <p className="text-white/70 text-sm">Hasta Sábado 28 Feb</p>
-            </div>
-          </div>
-          <p className="text-center text-white/50 text-sm">
-            Devoluciones con excusa hasta el Viernes 27 de Febrero
-          </p>
-        </div>
       </div>
     </div>
   );
