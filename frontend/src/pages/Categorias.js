@@ -45,14 +45,26 @@ const GROUP_CONFIG = {
   }
 };
 
+// Color mapping for pricing stages
+const STAGE_COLORS = {
+  'green': { bg: 'bg-green-500/20', border: 'border-green-500', text: 'text-green-400' },
+  'yellow': { bg: 'bg-yellow-500/20', border: 'border-yellow-500', text: 'text-yellow-400' },
+  'orange': { bg: 'bg-orange-500/20', border: 'border-orange-500', text: 'text-orange-400' },
+  'red-orange': { bg: 'bg-orange-600/20', border: 'border-orange-600', text: 'text-orange-500' },
+  'red': { bg: 'bg-red-500/20', border: 'border-red-500', text: 'text-red-400' }
+};
+
 export const Categorias = () => {
   const [categorias, setCategorias] = useState([]);
   const [precios, setPrecios] = useState({});
+  const [pricingStages, setPricingStages] = useState([]);
+  const [notaDevolucion, setNotaDevolucion] = useState('');
   const [grupos, setGrupos] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCategorias();
+    fetchPricingStages();
   }, []);
 
   const fetchCategorias = async () => {
@@ -65,6 +77,16 @@ export const Categorias = () => {
       console.error('Error fetching categorias:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPricingStages = async () => {
+    try {
+      const response = await axios.get(`${API}/pricing-stages`);
+      setPricingStages(response.data.stages || []);
+      setNotaDevolucion(response.data.nota_devolucion || '');
+    } catch (error) {
+      console.error('Error fetching pricing stages:', error);
     }
   };
 
@@ -147,6 +169,37 @@ export const Categorias = () => {
             );
           })}
         </div>
+
+        {/* Pricing Stages */}
+        {pricingStages.length > 0 && (
+          <div className="mt-16 bg-surface border border-white/10 p-8">
+            <h2 className="font-heading text-2xl font-bold uppercase mb-6 text-center text-glow-cyan">
+              Precios de Inscripción
+            </h2>
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${Math.min(pricingStages.length, 5)} gap-4 mb-8`}>
+              {pricingStages.map((stage, index) => {
+                const colors = STAGE_COLORS[stage.color] || STAGE_COLORS['green'];
+                return (
+                  <div 
+                    key={index} 
+                    className={`${colors.bg} border ${colors.border} p-4 text-center`}
+                  >
+                    <p className="text-white/60 text-xs mb-1 uppercase font-heading">{stage.etapa}</p>
+                    <p className={`font-heading font-black text-2xl ${colors.text}`}>
+                      ${stage.precio.toLocaleString()}
+                    </p>
+                    <p className="text-white/70 text-sm mt-1">{stage.fecha}</p>
+                  </div>
+                );
+              })}
+            </div>
+            {notaDevolucion && (
+              <p className="text-center text-white/50 text-sm">
+                {notaDevolucion}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

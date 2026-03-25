@@ -25,6 +25,7 @@ import { AdminConfiguracion } from './pages/admin/AdminConfiguracion';
 import { AdminAsistencia } from './pages/admin/AdminAsistencia';
 import { AdminGaleria } from './pages/admin/AdminGaleria';
 import { AdminCalendario } from './pages/admin/AdminCalendario';
+import { AdminEtapasPrecios } from './pages/admin/AdminEtapasPrecios';
 // Super Admin pages
 import { SuperAdminLogin } from './pages/superadmin/SuperAdminLogin';
 import { SuperAdminDashboard } from './pages/superadmin/SuperAdminDashboard';
@@ -65,6 +66,7 @@ function App() {
           <Route path="/admin/asistencia" element={<AdminAsistencia />} />
           <Route path="/admin/galeria" element={<AdminGaleria />} />
           <Route path="/admin/calendario" element={<AdminCalendario />} />
+          <Route path="/admin/etapas-precios" element={<AdminEtapasPrecios />} />
           
           {/* Super Admin Routes */}
           <Route path="/superadmin/login" element={<SuperAdminLogin />} />

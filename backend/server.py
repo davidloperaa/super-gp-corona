@@ -1069,6 +1069,40 @@ DEFAULT_DISCIPLINES = [
     {"id": "6", "nombre": "KARTS", "ubicacion": "Kartodromo"}
 ]
 
+# Default pricing stages
+DEFAULT_PRICING_STAGES = [
+    {"etapa": "Etapa 1", "precio": 100000, "fecha": "Hasta el Miércoles 1 de Abril", "color": "green"},
+    {"etapa": "Etapa 2", "precio": 120000, "fecha": "Hasta el Lunes 6 de Abril", "color": "yellow"},
+    {"etapa": "Etapa 3", "precio": 144000, "fecha": "Hasta el Martes 8 de Abril", "color": "orange"},
+    {"etapa": "Etapa 4", "precio": 178000, "fecha": "Hasta el Sábado 11 de Abril", "color": "red-orange"},
+    {"etapa": "Etapa 5", "precio": 200000, "fecha": "Domingo 12 de Abril", "color": "red"}
+]
+
+@api_router.get("/pricing-stages")
+async def get_pricing_stages():
+    """Get pricing stages for registration"""
+    doc = await db.pricing_stages.find_one({"_id": "stages"}, {"_id": 0})
+    if not doc:
+        return {"stages": DEFAULT_PRICING_STAGES, "nota_devolucion": "Devoluciones con excusa hasta el Viernes 11 de Abril"}
+    return {
+        "stages": doc.get("stages", DEFAULT_PRICING_STAGES),
+        "nota_devolucion": doc.get("nota_devolucion", "Devoluciones con excusa hasta el Viernes 11 de Abril")
+    }
+
+@api_router.put("/admin/pricing-stages")
+async def update_pricing_stages(data: dict, payload: dict = Depends(verify_token)):
+    """Update pricing stages"""
+    await db.pricing_stages.update_one(
+        {"_id": "stages"},
+        {"$set": {
+            "stages": data.get("stages", []),
+            "nota_devolucion": data.get("nota_devolucion", ""),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    return {"message": "Etapas de precios actualizadas exitosamente"}
+
 @api_router.get("/calendar")
 async def get_calendar():
     """Get calendar events and disciplines"""

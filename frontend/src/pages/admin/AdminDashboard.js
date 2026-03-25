@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Users, Ticket, Newspaper, LogOut, DollarSign, Settings, Image, List, Calendar } from 'lucide-react';
+import { Users, Ticket, Newspaper, LogOut, DollarSign, Settings, Image, List, Calendar, Tag } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -179,9 +179,21 @@ export const AdminDashboard = () => {
           >
             <DollarSign className="w-12 h-12 text-warning mb-4" />
             <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-warning transition-colors">
-              Gestionar Precios
+              Precios Categorías
             </h2>
             <p className="text-white/70">Actualizar precios de categorías</p>
+          </Link>
+
+          <Link
+            to="/admin/etapas-precios"
+            data-testid="link-etapas-precios"
+            className="bg-surface border-2 border-white/10 p-8 hover:border-orange-500 transition-colors group"
+          >
+            <Tag className="w-12 h-12 text-orange-500 mb-4" />
+            <h2 className="font-heading text-2xl font-bold uppercase mb-2 group-hover:text-orange-500 transition-colors">
+              Etapas de Precios
+            </h2>
+            <p className="text-white/70">Configurar etapas de inscripción</p>
           </Link>
 
           <Link
