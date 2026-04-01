@@ -306,6 +306,56 @@ def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
     
     categories_html = ''.join([f'<tr><td style="padding: 5px 10px; color: #333333; font-size: 14px;">• {cat}</td></tr>' for cat in registration['categorias']])
     
+    estado_pago = registration.get('estado_pago', 'pendiente_pago')
+    is_confirmed = estado_pago in ['completado', 'confirmado']
+    
+    header_title = "INSCRIPCIÓN CONFIRMADA" if is_confirmed else "PREINSCRIPCIÓN RECIBIDA"
+    header_color = "#10B981" if is_confirmed else "#DC2626"
+    status_text = "PAGADO" if is_confirmed else "PENDIENTE DE PAGO"
+    status_color = "#10B981" if is_confirmed else "#F59E0B"
+    
+    # Payment instructions for pending registrations
+    payment_section = ""
+    if not is_confirmed:
+        payment_section = """
+                        <!-- Payment Instructions -->
+                        <tr>
+                            <td style="padding: 0 30px 20px 30px;">
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #FEF3C7; border: 2px solid #F59E0B; border-radius: 8px;">
+                                    <tr>
+                                        <td style="padding: 20px;">
+                                            <h3 style="margin: 0 0 15px 0; color: #92400E; font-size: 18px; font-weight: bold;">Para confirmar tu cupo, realiza el pago:</h3>
+                                            <p style="margin: 0 0 10px 0; color: #333333; font-size: 16px;">
+                                                <strong>Nequi:</strong> <span style="font-size: 20px; color: #DC2626; font-weight: bold;">3104223288</span>
+                                            </p>
+                                            <p style="margin: 0 0 15px 0; color: #333333; font-size: 14px;">
+                                                <strong>Titular:</strong> Carlos Alberto Alarcón Flórez (Representante Legal)
+                                            </p>
+                                            <p style="margin: 0; color: #92400E; font-size: 14px; font-weight: bold;">
+                                                Después de pagar, envía el comprobante al WhatsApp: 3104223288
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        
+                        <!-- Warning -->
+                        <tr>
+                            <td style="padding: 0 30px 20px 30px;">
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #FEE2E2; border-radius: 8px;">
+                                    <tr>
+                                        <td style="padding: 15px 20px; text-align: center;">
+                                            <p style="margin: 0; color: #991B1B; font-size: 14px; font-weight: bold;">
+                                                ⚠️ Tu cupo queda reservado por 24 horas. El cupo NO está confirmado hasta validar el pago.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+        """
+    
     return f"""
     <!DOCTYPE html>
     <html>
@@ -321,51 +371,29 @@ def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
                         
                         <!-- Header -->
                         <tr>
-                            <td style="background-color: #DC2626; padding: 30px 20px; text-align: center;">
-                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">INSCRIPCIÓN CONFIRMADA</h1>
-                                <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px;">Campeonato Interligas Super GP Corona XP 2026</p>
+                            <td style="background-color: {header_color}; padding: 30px 20px; text-align: center;">
+                                <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">{header_title}</h1>
+                                <p style="margin: 10px 0 0 0; color: #ffffff; font-size: 16px;">Campeonato Interligas Super GP Corona Club XP 2026</p>
                             </td>
                         </tr>
                         
                         <!-- Welcome -->
                         <tr>
                             <td style="padding: 30px 30px 20px 30px;">
-                                <h2 style="margin: 0 0 15px 0; color: #DC2626; font-size: 22px;">¡Bienvenido al campeonato!</h2>
-                                <p style="margin: 0 0 10px 0; color: #333333; font-size: 16px; line-height: 1.5;">
-                                    Estimado/a <strong>{registration['nombre']} {registration['apellido']}</strong>,
-                                </p>
+                                <h2 style="margin: 0 0 15px 0; color: #DC2626; font-size: 22px;">¡Hola {registration['nombre']}!</h2>
                                 <p style="margin: 0; color: #333333; font-size: 16px; line-height: 1.5;">
-                                    Tu inscripción ha sido confirmada exitosamente para el Campeonato Interligas Super GP Corona XP 2026.
+                                    {"Tu inscripción ha sido confirmada exitosamente." if is_confirmed else "Hemos recibido tu preinscripción correctamente. Para confirmar tu cupo, sigue las instrucciones de pago."}
                                 </p>
                             </td>
                         </tr>
                         
-                        <!-- QR Code Section -->
-                        <tr>
-                            <td style="padding: 0 30px 20px 30px;">
-                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f8f9fa; border: 2px dashed #10B981; border-radius: 8px;">
-                                    <tr>
-                                        <td style="padding: 25px; text-align: center;">
-                                            <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px; font-weight: bold;">Tu Código QR de Acceso</h3>
-                                            <img src="{qr_url}" alt="Código QR" width="200" height="200" style="display: block; margin: 0 auto; border: 4px solid #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
-                                            <p style="margin: 15px 0 0 0; color: #666666; font-size: 14px;">Presenta este QR el día del evento para tu check-in</p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
+                        {payment_section}
                         
                         <!-- Details Section -->
                         <tr>
                             <td style="padding: 0 30px 20px 30px;">
                                 <h3 style="margin: 0 0 15px 0; color: #10B981; font-size: 18px; border-bottom: 2px solid #10B981; padding-bottom: 10px;">Detalles de tu inscripción</h3>
                                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                                    <tr>
-                                        <td style="padding: 8px 0; border-bottom: 1px solid #eeeeee;">
-                                            <strong style="color: #10B981;">ID de Inscripción:</strong>
-                                            <span style="color: #333333; margin-left: 10px;">{registration['id']}</span>
-                                        </td>
-                                    </tr>
                                     <tr>
                                         <td style="padding: 8px 0; border-bottom: 1px solid #eeeeee;">
                                             <strong style="color: #10B981;">Número de Competición:</strong>
@@ -386,14 +414,29 @@ def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
                                     {categories_html}
                                     <tr>
                                         <td style="padding: 8px 0; border-bottom: 1px solid #eeeeee;">
-                                            <strong style="color: #10B981;">Precio Total:</strong>
-                                            <span style="color: #333333; margin-left: 10px; font-weight: bold;">COP {registration['precio_final']:,.0f}</span>
+                                            <strong style="color: #10B981;">Total a Pagar:</strong>
+                                            <span style="color: #DC2626; margin-left: 10px; font-weight: bold; font-size: 20px;">COP {registration['precio_final']:,.0f}</span>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0;">
-                                            <strong style="color: #10B981;">Estado de Pago:</strong>
-                                            <span style="color: #ffffff; margin-left: 10px; background-color: #10B981; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 12px;">{registration['estado_pago'].upper()}</span>
+                                            <strong style="color: #10B981;">Estado:</strong>
+                                            <span style="color: #ffffff; margin-left: 10px; background-color: {status_color}; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 12px;">{status_text}</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        
+                        <!-- QR Code Section -->
+                        <tr>
+                            <td style="padding: 0 30px 20px 30px;">
+                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f8f9fa; border: 2px dashed #10B981; border-radius: 8px;">
+                                    <tr>
+                                        <td style="padding: 25px; text-align: center;">
+                                            <h3 style="margin: 0 0 15px 0; color: #333333; font-size: 18px; font-weight: bold;">Tu Código QR de Acceso</h3>
+                                            <img src="{qr_url}" alt="Código QR" width="200" height="200" style="display: block; margin: 0 auto; border: 4px solid #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+                                            <p style="margin: 15px 0 0 0; color: #666666; font-size: 14px;">Presenta este QR el día del evento para tu check-in</p>
                                         </td>
                                     </tr>
                                 </table>
@@ -405,7 +448,7 @@ def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
                             <td style="padding: 0 30px 20px 30px;">
                                 <h3 style="margin: 0 0 15px 0; color: #10B981; font-size: 18px; border-bottom: 2px solid #10B981; padding-bottom: 10px;">Información del Evento</h3>
                                 <p style="margin: 0 0 8px 0; color: #333333; font-size: 15px;">
-                                    <strong>Fechas:</strong> 27, 28 de Febrero y 1 de Marzo 2026
+                                    <strong>Fechas:</strong> 11 y 12 de Abril 2026
                                 </p>
                                 <p style="margin: 0; color: #333333; font-size: 15px;">
                                     <strong>Ubicación:</strong> Corona Club XP, Avenida Panamericana Km 9 El Cofre, Popayán
@@ -413,26 +456,11 @@ def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
                             </td>
                         </tr>
                         
-                        <!-- Important Notice -->
-                        <tr>
-                            <td style="padding: 0 30px 20px 30px;">
-                                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #DC2626; border-radius: 8px;">
-                                    <tr>
-                                        <td style="padding: 15px 20px; text-align: center;">
-                                            <p style="margin: 0; color: #ffffff; font-size: 14px; font-weight: bold;">
-                                                ⚠️ IMPORTANTE: Lleva tu QR code impreso o en tu celular el día del evento
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        
                         <!-- Contact -->
                         <tr>
                             <td style="padding: 0 30px 30px 30px;">
                                 <p style="margin: 0 0 15px 0; color: #333333; font-size: 14px;">
-                                    Para cualquier consulta, contáctanos en <a href="mailto:inscripcionescorona@gmail.com" style="color: #10B981; text-decoration: none; font-weight: bold;">inscripcionescorona@gmail.com</a>
+                                    Para cualquier consulta, contáctanos en <a href="mailto:coronaclubxtreme@gmail.com" style="color: #10B981; text-decoration: none; font-weight: bold;">coronaclubxtreme@gmail.com</a> o WhatsApp: <a href="https://wa.me/573104223288" style="color: #10B981; text-decoration: none; font-weight: bold;">3104223288</a>
                                 </p>
                                 <p style="margin: 0; color: #DC2626; font-size: 16px; font-weight: bold;">
                                     ¡Nos vemos en la pista! 🏁
@@ -445,6 +473,9 @@ def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
                             <td style="background-color: #1a1a1a; padding: 20px 30px; text-align: center;">
                                 <p style="margin: 0; color: #999999; font-size: 12px;">
                                     © 2026 Corona Club XP - Campeonato Interligas Super GP
+                                </p>
+                                <p style="margin: 5px 0 0 0; color: #666666; font-size: 11px;">
+                                    Carlos Alberto Alarcón Flórez | NIT: 10306883 | SEC EL COFRE KM NUEVE VIA POPAYAN-CALI
                                 </p>
                             </td>
                         </tr>
@@ -857,6 +888,56 @@ async def update_registration(registration_id: str, data: dict, payload: dict = 
         )
     
     return {"message": "Inscripción actualizada", "updated_fields": list(update_fields.keys())}
+
+@api_router.post("/admin/registrations/{registration_id}/resend-email")
+async def resend_confirmation_email(registration_id: str, payload: dict = Depends(verify_token)):
+    """Resend confirmation email to a registration"""
+    reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    try:
+        qr_code = reg.get("qr_code", "")
+        email_html = generate_confirmation_email(reg, qr_code)
+        send_email(
+            reg["correo"], 
+            "Confirmación de Preinscripción - Super GP Corona Club XP 2026", 
+            email_html, 
+            EMAIL_ADMIN
+        )
+        return {"message": f"Correo enviado a {reg['correo']}", "email": reg["correo"]}
+    except Exception as e:
+        logging.error(f"Error sending email to {reg['correo']}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error enviando correo: {str(e)}")
+
+@api_router.post("/admin/registrations/resend-all-emails")
+async def resend_all_confirmation_emails(payload: dict = Depends(verify_token)):
+    """Resend confirmation emails to all registrations"""
+    registrations = await db.registrations.find({}, {"_id": 0}).to_list(1000)
+    
+    sent = 0
+    errors = []
+    
+    for reg in registrations:
+        try:
+            qr_code = reg.get("qr_code", "")
+            email_html = generate_confirmation_email(reg, qr_code)
+            send_email(
+                reg["correo"], 
+                "Confirmación de Preinscripción - Super GP Corona Club XP 2026", 
+                email_html, 
+                EMAIL_ADMIN
+            )
+            sent += 1
+        except Exception as e:
+            errors.append({"nombre": f"{reg['nombre']} {reg['apellido']}", "error": str(e)})
+    
+    return {
+        "message": f"Correos enviados: {sent}/{len(registrations)}",
+        "sent": sent,
+        "total": len(registrations),
+        "errors": errors
+    }
 
 @api_router.put("/admin/category-price")
 async def update_price(update: CategoryPriceUpdate, payload: dict = Depends(verify_token)):
