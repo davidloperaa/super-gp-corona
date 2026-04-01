@@ -458,21 +458,21 @@ def generate_confirmation_email(registration: dict, qr_code: str = None) -> str:
     """
 
 async def calculate_precio(categorias: List[str], codigo_cupon: Optional[str] = None) -> tuple:
+    """
+    Calculate registration price based on category prices.
+    The price shown is the sum of all selected category prices.
+    No automatic multipliers are applied - only coupon discounts.
+    """
     prices = await get_category_prices()
-    precio_base = sum([prices.get(cat, 120000) for cat in categorias])
+    
+    # Sum the price of all selected categories directly (no multipliers)
+    precio_base = sum([prices.get(cat, 100000) for cat in categorias])
+    
     descuento = 0.0
     tipo_descuento = 0
+    fase_actual = "precio configurado"
     
-    fase_actual = "ordinaria"
-    fecha_actual = datetime.now(timezone.utc)
-    
-    if fecha_actual.month == 1:
-        fase_actual = "preventa"
-        precio_base = precio_base * 0.85
-    elif fecha_actual.month >= 3:
-        fase_actual = "extraordinaria"
-        precio_base = precio_base * 1.2
-    
+    # Apply coupon discount if provided
     if codigo_cupon:
         coupon = await db.coupons.find_one({"codigo": codigo_cupon.upper(), "activo": True})
         if coupon:
