@@ -828,6 +828,36 @@ async def get_news():
             news['created_at'] = datetime.fromisoformat(news['created_at'])
     return {"news": news_list}
 
+@api_router.put("/admin/registrations/{registration_id}")
+async def update_registration(registration_id: str, data: dict, payload: dict = Depends(verify_token)):
+    """Update a registration's details (prices, status, etc.)"""
+    reg = await db.registrations.find_one({"id": registration_id})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    # Fields that can be updated
+    update_fields = {}
+    if "precio_base" in data:
+        update_fields["precio_base"] = data["precio_base"]
+    if "precio_final" in data:
+        update_fields["precio_final"] = data["precio_final"]
+    if "descuento" in data:
+        update_fields["descuento"] = data["descuento"]
+    if "estado_pago" in data:
+        update_fields["estado_pago"] = data["estado_pago"]
+    if "neto_evento" in data:
+        update_fields["neto_evento"] = data["neto_evento"]
+    if "comision_plataforma" in data:
+        update_fields["comision_plataforma"] = data["comision_plataforma"]
+    
+    if update_fields:
+        await db.registrations.update_one(
+            {"id": registration_id},
+            {"$set": update_fields}
+        )
+    
+    return {"message": "Inscripción actualizada", "updated_fields": list(update_fields.keys())}
+
 @api_router.put("/admin/category-price")
 async def update_price(update: CategoryPriceUpdate, payload: dict = Depends(verify_token)):
     # Get categories from database
