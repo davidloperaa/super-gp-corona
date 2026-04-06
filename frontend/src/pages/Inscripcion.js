@@ -369,7 +369,7 @@ export const Inscripcion = () => {
               )}
 
               <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-6">
-                {['VELOCIDAD TOP', 'VELOCIDAD', 'VELOCIDAD RECREATIVAS', 'KARTS', 'VELOTIERRA', 'MOTOCROSS'].map((groupName) => {
+                {['VELOCIDAD TOP', 'VELOCIDAD', 'VELOCIDAD RECREATIVAS', 'KARTS', 'VELOTIERRA', 'MOTOCROSS', 'EVENTOS ESPECIALES'].map((groupName) => {
                   const groupCats = grupos[groupName] || [];
                   if (groupCats.length === 0) return null;
                   
@@ -379,7 +379,8 @@ export const Inscripcion = () => {
                     'VELOCIDAD RECREATIVAS': 'border-accent bg-accent/20 text-accent',
                     'KARTS': 'border-warning bg-warning/20 text-warning',
                     'VELOTIERRA': 'border-orange-500 bg-orange-500/20 text-orange-500',
-                    'MOTOCROSS': 'border-green-500 bg-green-500/20 text-green-500'
+                    'MOTOCROSS': 'border-green-500 bg-green-500/20 text-green-500',
+                    'EVENTOS ESPECIALES': 'border-purple-500 bg-purple-500/20 text-purple-500'
                   };
                   
                   return (

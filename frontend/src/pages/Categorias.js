@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Trophy, DollarSign, Flame, Flag, Car, Mountain, Bike } from 'lucide-react';
+import { Trophy, DollarSign, Flame, Flag, Car, Mountain, Bike, Star } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -42,6 +42,12 @@ const GROUP_CONFIG = {
     headerBg: 'bg-green-500',
     icon: Bike,
     description: 'Trofeos'
+  },
+  'EVENTOS ESPECIALES': {
+    color: 'border-purple-500 bg-purple-500/10',
+    headerBg: 'bg-purple-500',
+    icon: Star,
+    description: 'Evento nocturno especial - Viernes 10 de Abril'
   }
 };
 
