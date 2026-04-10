@@ -156,7 +156,7 @@ export const AdminRegistrations = () => {
 
   // Export to CSV
   const exportToCSV = (data, filename) => {
-    const headers = ['Nombre', 'Apellido', 'Cédula', 'Número', 'Correo', 'Celular', 'Categorías', 'Precio', 'Estado', 'Fecha'];
+    const headers = ['Nombre', 'Apellido', 'Cédula', 'Número', 'Correo', 'Celular', 'Liga', 'Categorías', 'Precio', 'Estado', 'Fecha'];
     const rows = data.map(reg => [
       reg.nombre,
       reg.apellido,
@@ -164,6 +164,7 @@ export const AdminRegistrations = () => {
       reg.numero_competicion,
       reg.correo,
       reg.celular,
+      reg.liga || '',
       (reg.categorias || []).join('; '),
       reg.precio_final || 0,
       reg.estado_pago,
@@ -352,6 +353,7 @@ export const AdminRegistrations = () => {
                   <th className="px-4 py-3 text-left">Cédula</th>
                   <th className="px-4 py-3 text-left">Número</th>
                   <th className="px-4 py-3 text-left">Celular</th>
+                  <th className="px-4 py-3 text-left">Liga</th>
                   <th className="px-4 py-3 text-left">Categorías</th>
                   <th className="px-4 py-3 text-right">Precio</th>
                   <th className="px-4 py-3 text-center">Estado</th>
@@ -377,6 +379,7 @@ export const AdminRegistrations = () => {
                       <span className="font-heading font-black text-primary">#{reg.numero_competicion}</span>
                     </td>
                     <td className="px-4 py-3 text-white/70">{reg.celular}</td>
+                    <td className="px-4 py-3 text-white/70">{reg.liga || '-'}</td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
                         {reg.categorias?.map((cat, idx) => (
