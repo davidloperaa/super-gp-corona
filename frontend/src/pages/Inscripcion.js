@@ -571,18 +571,7 @@ export const Inscripcion = () => {
                   </div>
                 )}
 
-                {/* Payment Info */}
-                <div className="bg-green-500/10 border border-green-500/30 p-6">
-                  <h3 className="font-heading font-bold text-green-400 mb-3">Información de Pago</h3>
-                  <p className="text-white/80 mb-2">
-                    El pago se realizará mediante transferencia a <strong className="text-green-400">Nequi: 3104223288</strong>
-                  </p>
-                  <p className="text-white/60 text-sm">
-                    Después de enviar el formulario, recibirás las instrucciones completas para confirmar tu inscripción.
-                  </p>
-                </div>
-
-                {/* Comprobante de Pago (Opcional) */}
+                {/* Comprobante de Pago (Opcional) — moved above Payment Info for visibility */}
                 <div className="bg-black/50 border border-secondary/40 p-6" data-testid="comprobante-section">
                   <h3 className="font-heading font-bold mb-2 flex items-center space-x-2">
                     <Upload className="w-5 h-5 text-secondary" />
@@ -646,6 +635,17 @@ export const Inscripcion = () => {
                       <span>No has adjuntado el comprobante. Si haces clic de nuevo en "Enviar Preinscripción", continuaremos sin él y tu inscripción quedará pendiente de pago.</span>
                     </p>
                   )}
+                </div>
+
+                {/* Payment Info */}
+                <div className="bg-green-500/10 border border-green-500/30 p-6">
+                  <h3 className="font-heading font-bold text-green-400 mb-3">Información de Pago</h3>
+                  <p className="text-white/80 mb-2">
+                    El pago se realizará mediante transferencia a <strong className="text-green-400">Nequi: 3104223288</strong>
+                  </p>
+                  <p className="text-white/60 text-sm">
+                    Si aún no has pagado, después de enviar el formulario recibirás las instrucciones completas para confirmar tu inscripción.
+                  </p>
                 </div>
 
                 {/* Terms and Conditions Checkbox */}
