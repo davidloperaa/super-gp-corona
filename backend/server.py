@@ -43,7 +43,9 @@ app = FastAPI(title="Super GP Corona XP 2026 API")
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
 
-# Mount static files for uploads
+# Mount static files for uploads under /api so it's reachable through the ingress
+app.mount("/api/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads_api")
+# Also mount at /uploads for backward compatibility with existing gallery URLs
 app.mount("/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 JWT_SECRET = os.getenv('JWT_SECRET', 'super-secret-key-change-in-production')
@@ -609,7 +611,7 @@ async def create_registration(reg: RegistrationCreate):
         comision_plataforma=comision,
         neto_evento=neto_evento,
         codigo_cupon=reg.codigo_cupon,
-        estado_pago="pendiente_pago"  # Always pending - manual payment verification
+        estado_pago="pendiente"  # Manual payment verification (will become "completado" when comprobante is uploaded)
     )
     
     qr_code = generate_qr_code(registration.id, JWT_SECRET)
@@ -659,16 +661,25 @@ async def upload_comprobante(registration_id: str, file: UploadFile = File(...))
         raise HTTPException(status_code=500, detail=f"Error al guardar archivo: {str(e)}")
     
     # Update registration with comprobante info
-    comprobante_url = f"/uploads/{unique_filename}"
+    comprobante_url = f"/api/uploads/{unique_filename}"
     await db.registrations.update_one(
         {"id": registration_id},
         {"$set": {
             "comprobante_url": comprobante_url,
             "comprobante_filename": file.filename,
             "tiene_comprobante": True,
-            "estado_pago": "confirmado"
+            "estado_pago": "completado"
         }}
     )
+    
+    # Send confirmation email now that payment is confirmed
+    try:
+        updated_reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
+        if updated_reg:
+            email_html = generate_confirmation_email(updated_reg, updated_reg.get('qr_code'))
+            send_email(updated_reg["correo"], "Confirmación de Inscripción - Super GP Corona XP 2026", email_html, EMAIL_ADMIN)
+    except Exception as e:
+        logging.error(f"Error sending confirmation email after comprobante upload: {str(e)}")
     
     return {
         "message": "Comprobante cargado exitosamente",

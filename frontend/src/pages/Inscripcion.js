@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { ChevronRight, ChevronLeft, Check, Loader, FileText } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Loader, FileText, Upload, AlertTriangle } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -19,6 +19,10 @@ export const Inscripcion = () => {
   const [cuponValido, setCuponValido] = useState(false);
   const [precioCalculado, setPrecioCalculado] = useState(null);
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [comprobanteFile, setComprobanteFile] = useState(null);
+  const [comprobanteError, setComprobanteError] = useState('');
+  const [submitAttemptedWithoutFile, setSubmitAttemptedWithoutFile] = useState(false);
+  const fileInputRef = useRef(null);
   
   const [formData, setFormData] = useState({
     nombre: '',
@@ -141,6 +145,30 @@ export const Inscripcion = () => {
     });
   };
 
+  const handleComprobanteChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      setComprobanteFile(null);
+      return;
+    }
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    const maxSizeMB = 10;
+    if (!allowedTypes.includes(file.type)) {
+      setComprobanteError('Formato no permitido. Usa JPG, PNG, GIF, WEBP o PDF.');
+      setComprobanteFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+    if (file.size > maxSizeMB * 1024 * 1024) {
+      setComprobanteError(`El archivo supera ${maxSizeMB}MB.`);
+      setComprobanteFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+    setComprobanteError('');
+    setComprobanteFile(file);
+  };
+
   const handleSubmit = async () => {
     if (!validateStep()) return;
     
@@ -149,16 +177,41 @@ export const Inscripcion = () => {
       return;
     }
 
+    // One-time warning: if no file attached and user hasn't attempted yet,
+    // show alert and require a second click to proceed without comprobante.
+    if (!comprobanteFile && !submitAttemptedWithoutFile) {
+      setSubmitAttemptedWithoutFile(true);
+      alert('⚠️ No has adjuntado el comprobante de pago.\n\nSi ya pagaste, adjunta tu comprobante para confirmar tu cupo inmediatamente.\n\nSi aún no has pagado, puedes continuar y enviarnos el comprobante por WhatsApp más tarde. Para enviar la preinscripción sin comprobante, haz clic en "Enviar Preinscripción" una vez más.');
+      return;
+    }
+
     setLoading(true);
     try {
+      // 1. Create the registration (JSON payload)
       const response = await axios.post(`${API}/registrations`, {
         ...formData,
         codigo_cupon: codigoCupon || null,
       });
 
       const registration = response.data;
-      
-      // Redirect to pre-registration confirmation page
+
+      // 2. If user attached a comprobante, upload it now
+      if (comprobanteFile) {
+        try {
+          const fileForm = new FormData();
+          fileForm.append('file', comprobanteFile);
+          await axios.post(
+            `${API}/registrations/${registration.id}/upload-comprobante`,
+            fileForm,
+            { headers: { 'Content-Type': 'multipart/form-data' } }
+          );
+        } catch (uploadErr) {
+          console.error('Error subiendo comprobante:', uploadErr);
+          alert('La preinscripción se creó correctamente, pero hubo un problema subiendo el comprobante. Podrás enviarlo por WhatsApp.');
+        }
+      }
+
+      // 3. Redirect to pre-registration confirmation page
       navigate('/confirmacion-preinscripcion?registration_id=' + registration.id);
     } catch (error) {
       console.error('Error:', error);
@@ -169,7 +222,6 @@ export const Inscripcion = () => {
         if (typeof detail === 'string') {
           errorMessage = detail;
         } else if (Array.isArray(detail)) {
-          // Pydantic validation errors come as array
           const fieldErrors = detail.map(err => {
             const field = err.loc?.slice(-1)[0] || 'campo';
             const fieldNames = {
@@ -528,6 +580,72 @@ export const Inscripcion = () => {
                   <p className="text-white/60 text-sm">
                     Después de enviar el formulario, recibirás las instrucciones completas para confirmar tu inscripción.
                   </p>
+                </div>
+
+                {/* Comprobante de Pago (Opcional) */}
+                <div className="bg-black/50 border border-secondary/40 p-6" data-testid="comprobante-section">
+                  <h3 className="font-heading font-bold mb-2 flex items-center space-x-2">
+                    <Upload className="w-5 h-5 text-secondary" />
+                    <span>Comprobante de Pago (Opcional)</span>
+                  </h3>
+                  <p className="text-white/80 text-sm mb-3">
+                    <strong className="text-secondary">Recuerda</strong> que ahora puedes adjuntar tu comprobante de pago aquí mismo para <strong>confirmar tu cupo de inmediato</strong>.
+                  </p>
+                  <p className="text-white/60 text-xs mb-4">
+                    Si lo adjuntas, tu inscripción quedará marcada como <strong className="text-green-400">CONFIRMADA</strong>. Si lo dejas vacío, podrás enviarlo después por WhatsApp.
+                  </p>
+
+                  <label
+                    htmlFor="comprobante-input"
+                    className="flex items-center justify-center gap-2 cursor-pointer bg-secondary/10 hover:bg-secondary/20 border-2 border-dashed border-secondary/50 text-secondary font-heading font-bold uppercase px-4 py-4 transition-colors"
+                    data-testid="comprobante-dropzone"
+                  >
+                    <Upload className="w-5 h-5" />
+                    <span>{comprobanteFile ? 'Cambiar archivo' : 'Adjuntar comprobante (JPG, PNG, PDF)'}</span>
+                  </label>
+                  <input
+                    id="comprobante-input"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                    onChange={handleComprobanteChange}
+                    className="hidden"
+                    data-testid="input-comprobante"
+                  />
+
+                  {comprobanteFile && (
+                    <div className="mt-3 flex items-center justify-between bg-green-500/10 border border-green-500/30 px-4 py-2" data-testid="comprobante-selected">
+                      <div className="flex items-center space-x-2 min-w-0">
+                        <FileText className="w-4 h-4 text-green-400 flex-shrink-0" />
+                        <span className="text-green-300 text-sm truncate">{comprobanteFile.name}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setComprobanteFile(null);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                        className="text-xs text-white/70 hover:text-white uppercase font-heading ml-3 flex-shrink-0"
+                        data-testid="btn-remove-comprobante"
+                      >
+                        Quitar
+                      </button>
+                    </div>
+                  )}
+
+                  {comprobanteError && (
+                    <p className="text-red-400 text-sm mt-2 flex items-center space-x-1" data-testid="comprobante-error">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span>{comprobanteError}</span>
+                    </p>
+                  )}
+
+                  {!comprobanteFile && submitAttemptedWithoutFile && (
+                    <p className="text-warning text-sm mt-3 flex items-start space-x-2" data-testid="comprobante-warning">
+                      <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <span>No has adjuntado el comprobante. Si haces clic de nuevo en "Enviar Preinscripción", continuaremos sin él y tu inscripción quedará pendiente de pago.</span>
+                    </p>
+                  )}
                 </div>
 
                 {/* Terms and Conditions Checkbox */}

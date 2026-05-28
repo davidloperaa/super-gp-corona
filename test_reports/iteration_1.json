@@ -1,0 +1,50 @@
+{
+  "summary": "E2E validation of Comprobante de Pago (Payment Proof) feature on /inscripcion. Backend (5/5 pytest) and Frontend (3/3 Playwright flows) all pass. One-time warning logic, file upload flow, admin column, 'Ver' link, and CSV export columns all working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/admin/registrations and others", "issues": ["React hydration console warnings: <span> incorrectly nested inside <select>/<tr>/<tbody> in some admin components. Non-blocking but generates 4 console errors per load and may cause SSR/hydration issues."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_comprobante_flow.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Investigate and fix the React hydration warnings (<span> not allowed as direct child of <select>/<tr>/<tbody>) in admin components — these are pre-existing and unrelated to the comprobante feature, but worth cleaning up.",
+    "(Optional/cosmetic) Task spec references button label 'Exportar Todas' but the UI shows 'Exportar Todo' (data-testid='btn-exportar-todo'). Behavior is correct; verify if main agent wants to rename to match the PRD wording."
+  ],
+  "critical_code_review_comments": [
+    "Backend file /app/backend/server.py is 1776 lines — recommend modularizing into routers (registrations, admin, payments, gallery, etc.) for maintainability.",
+    "/api/registrations/{id}/upload-comprobante has no authentication. Any client can upload a comprobante to any registration ID if they know it. Consider gating by admin token OR a short-lived signed token returned at registration creation. Current behavior is intentional per the public inscripcion flow, but worth flagging.",
+    "Uploaded files are served publicly with no auth. The filename includes a uuid suffix so guessing is hard, but treat as security-sensitive (PII in payment screenshots). Consider serving via authenticated endpoint or signed URLs.",
+    "create_registration does not explicitly set tiene_comprobante/comprobante_url on the new doc; relies on Pydantic defaults — works correctly today but explicit defaults would be safer.",
+    "MercadoPago endpoint has dead code after early return (lines 715+ in server.py) — should be removed."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_comprobante_flow.py (new)"
+  ],
+  "success_rate": {"backend": "100% (5/5)", "frontend": "100% (3/3 flows)"},
+  "test_credentials": "admin@coronaxp.com / Admin2026! (POST /api/admin/login → access_token)",
+  "seed_data_creation": "Created 2 TEST_-prefixed registrations during E2E run; both deleted via DELETE /api/admin/registrations/{id} after tests. Pytest tests also self-clean.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend pytest suite at /app/backend/tests/test_comprobante_flow.py covers: create-registration default state ('pendiente', no comprobante), upload-comprobante updates state to 'completado' + tiene_comprobante=true + file is publicly accessible via returned URL, 404 on bad id, 400 on bad mime type. GET /api/registrations returns dict {registrations:[...]} not a list — handled in tests. Admin login endpoint returns 'access_token'.",
+  "verified_flows": [
+    "POST /api/registrations → estado_pago='pendiente', tiene_comprobante absent/false ✅",
+    "POST /api/registrations/{id}/upload-comprobante (PDF) → estado_pago='completado', tiene_comprobante=true, comprobante_url=/api/uploads/... ✅",
+    "GET {BASE}/api/uploads/{file} → 200 with PDF content ✅",
+    "Admin login returns access_token; GET /api/registrations returns tiene_comprobante & comprobante_url ✅",
+    "Frontend /inscripcion shows [data-testid=comprobante-section] in Resumen step ✅",
+    "Submit without file (1st click) → window.alert fires + [data-testid=comprobante-warning] visible + no navigation ✅",
+    "Submit without file (2nd click) → registration created (estado_pago=pendiente) + navigates to /confirmacion-preinscripcion?registration_id=... ✅",
+    "Submit with PDF attached → registration created, comprobante uploaded, navigates to confirmation ✅",
+    "/admin/registrations shows 'Comprobante' column with [data-testid=btn-ver-comprobante-{id}] link or '—' ✅",
+    "CSV export ('Exportar Todo' button) includes 'Adjuntó comprobante' (Sí/No) and 'URL Comprobante' columns ✅"
+  ]
+}

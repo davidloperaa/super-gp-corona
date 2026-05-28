@@ -156,7 +156,7 @@ export const AdminRegistrations = () => {
 
   // Export to CSV
   const exportToCSV = (data, filename) => {
-    const headers = ['Nombre', 'Apellido', 'Cédula', 'Número', 'Correo', 'Celular', 'Liga', 'Categorías', 'Precio', 'Estado', 'Fecha'];
+    const headers = ['Nombre', 'Apellido', 'Cédula', 'Número', 'Correo', 'Celular', 'Liga', 'Categorías', 'Precio', 'Estado', 'Adjuntó comprobante', 'URL Comprobante', 'Fecha'];
     const rows = data.map(reg => [
       reg.nombre,
       reg.apellido,
@@ -168,6 +168,8 @@ export const AdminRegistrations = () => {
       (reg.categorias || []).join('; '),
       reg.precio_final || 0,
       reg.estado_pago,
+      reg.tiene_comprobante ? 'Sí' : 'No',
+      reg.comprobante_url ? `${BACKEND_URL}${reg.comprobante_url}` : '',
       formatDate(reg.created_at)
     ]);
     
@@ -357,6 +359,7 @@ export const AdminRegistrations = () => {
                   <th className="px-4 py-3 text-left">Categorías</th>
                   <th className="px-4 py-3 text-right">Precio</th>
                   <th className="px-4 py-3 text-center">Estado</th>
+                  <th className="px-4 py-3 text-center">Comprobante</th>
                   <th className="px-4 py-3 text-left">Fecha</th>
                   <th className="px-4 py-3 text-center">Acciones</th>
                 </tr>
@@ -402,6 +405,22 @@ export const AdminRegistrations = () => {
                       >
                         {reg.estado_pago}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {reg.tiene_comprobante && reg.comprobante_url ? (
+                        <a
+                          href={`${BACKEND_URL}${reg.comprobante_url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs uppercase font-heading font-bold text-secondary hover:text-secondary/80 underline"
+                          data-testid={`btn-ver-comprobante-${reg.id}`}
+                          title={reg.comprobante_filename || 'Ver comprobante'}
+                        >
+                          Ver
+                        </a>
+                      ) : (
+                        <span className="text-xs text-white/40">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-white/70 text-sm">
                       {formatDate(reg.created_at)}
