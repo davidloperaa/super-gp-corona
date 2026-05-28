@@ -132,7 +132,7 @@ export const Home = () => {
                 </li>
                 <li className="flex items-center space-x-3">
                   <Trophy className="w-5 h-5 text-primary" />
-                  <span className="text-white">28 categorías diferentes</span>
+                  <span className="text-white">13 categorías diferentes</span>
                 </li>
                 <li className="flex items-center space-x-3">
                   <Flag className="w-5 h-5 text-primary" />
