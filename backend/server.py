@@ -167,6 +167,10 @@ class Registration(BaseModel):
     qr_code: Optional[str] = None
     check_in: bool = False
     check_in_time: Optional[datetime] = None
+    # Payment proof
+    comprobante_url: Optional[str] = None
+    comprobante_filename: Optional[str] = None
+    tiene_comprobante: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Coupon(BaseModel):
@@ -628,6 +632,62 @@ async def create_registration(reg: RegistrationCreate):
     # Note: Email will be sent after manual payment verification by admin
     
     return registration
+
+@api_router.post("/registrations/{registration_id}/upload-comprobante")
+async def upload_comprobante(registration_id: str, file: UploadFile = File(...)):
+    """Upload payment proof for a registration"""
+    # Verify registration exists
+    reg = await db.registrations.find_one({"id": registration_id})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    # Validate file type
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Tipo de archivo no permitido. Use JPG, PNG, GIF, WEBP o PDF")
+    
+    # Create unique filename
+    ext = file.filename.split('.')[-1] if '.' in file.filename else 'bin'
+    unique_filename = f"comprobante_{registration_id}_{uuid.uuid4().hex[:8]}.{ext}"
+    file_path = UPLOADS_DIR / unique_filename
+    
+    # Save file
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al guardar archivo: {str(e)}")
+    
+    # Update registration with comprobante info
+    comprobante_url = f"/uploads/{unique_filename}"
+    await db.registrations.update_one(
+        {"id": registration_id},
+        {"$set": {
+            "comprobante_url": comprobante_url,
+            "comprobante_filename": file.filename,
+            "tiene_comprobante": True,
+            "estado_pago": "confirmado"
+        }}
+    )
+    
+    return {
+        "message": "Comprobante cargado exitosamente",
+        "comprobante_url": comprobante_url,
+        "filename": file.filename
+    }
+
+@api_router.get("/registrations/{registration_id}/comprobante")
+async def get_comprobante(registration_id: str):
+    """Get comprobante info for a registration"""
+    reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
+    if not reg:
+        raise HTTPException(status_code=404, detail="Inscripción no encontrada")
+    
+    return {
+        "tiene_comprobante": reg.get("tiene_comprobante", False),
+        "comprobante_url": reg.get("comprobante_url"),
+        "comprobante_filename": reg.get("comprobante_filename")
+    }
 
 # MercadoPago endpoints DISABLED - Payment is now manual via Nequi transfer
 @api_router.post("/payments/create-preference")
