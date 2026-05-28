@@ -19,10 +19,15 @@ Sitio web moderno y dinámico para el evento de carreras de motocicletas "Campeo
 - Cálculo dinámico de precios por fase
 - Sistema de cupones de descuento
 
-### 2. Sistema de Pagos (MercadoPago)
-- Integración con MercadoPago Colombia
-- Webhooks para confirmación automática
-- Verificación manual de pagos
+### 2. Sistema de Pagos (Manual)
+- **MercadoPago DESHABILITADO** — el sitio opera en modo pre-inscripción manual
+- Pago vía transferencia bancaria: Bancolombia, Davivienda, Nequi (3104223288)
+- Subida opcional de Comprobante de Pago en el último paso del formulario
+  - Si se adjunta → estado_pago = "completado" y se envía email de confirmación
+  - Si NO se adjunta → estado_pago = "pendiente" (validación manual posterior)
+  - Advertencia de "una sola vez" si se envía sin archivo
+- Admin puede ver el comprobante desde `/admin/registrations` y exportar columnas "Adjuntó comprobante" + "URL Comprobante" en CSV
+- Verificación manual de pagos desde admin
 
 ### 3. Notificaciones por Email (Resend)
 - Confirmación de inscripción con diseño inline CSS
@@ -115,10 +120,23 @@ Sitio web moderno y dinámico para el evento de carreras de motocicletas "Campeo
 3. ⏳ CMS guardando cambios correctamente
 4. ⏳ Botón "Guardar Todos" en precios
 
+## Cambios Recientes (Feb 2026)
+- ✅ Feature P0: Comprobante de Pago opcional en `/inscripcion`
+  - Frontend (`Inscripcion.js`): input file con lógica "one-time warning", subida tras crear registro
+  - Backend: endpoint `POST /api/registrations/{id}/upload-comprobante` actualiza estado_pago→"completado" y envía email
+  - Admin (`AdminRegistrations.js`): columna "Comprobante" con link "Ver" + CSV con columnas "Adjuntó comprobante" y "URL Comprobante"
+  - Mount `/api/uploads` para que los archivos sean accesibles a través del ingress (Kubernetes preview)
+  - Estado normalizado: "pendiente"/"completado" (eliminadas variantes "pendiente_pago"/"confirmado")
+  - Tests: `/app/backend/tests/test_comprobante_flow.py` (5/5 backend) + E2E Playwright (3/3 flows)
+
 ## Tareas Futuras
 1. Configuración de dominio personalizado
 2. Refactorizar Admin con componente `AdminLayout` compartido
+3. Modularizar `server.py` (1776 líneas) en routers (registrations, admin, payments, gallery)
+4. Agregar autenticación al endpoint `/upload-comprobante` o cambiar a URL firmada (mejora de seguridad)
+5. Limpiar dead code de MercadoPago en `server.py`
+6. Investigar warnings de hidratación React en componentes admin (`<span>` dentro de `<select>/<tr>/<tbody>`)
 
 ## Última Actualización
-- **Fecha:** Diciembre 2025
-- **Cambio:** Restauración de 30 categorías con estructura de grupos
+- **Fecha:** Febrero 2026
+- **Cambio:** Feature de Comprobante de Pago opcional en /inscripcion (estado se actualiza automáticamente a "completado" al subir archivo). Visible y exportable en admin.
