@@ -154,6 +154,13 @@ export const AdminRegistrations = () => {
   // Get unique categories from registrations
   const usedCategories = [...new Set(registrations.flatMap(r => r.categorias || []))];
 
+  // Map internal status to human-readable label
+  const statusLabel = (s) => ({
+    pendiente: 'Pendiente',
+    pendiente_verificacion: 'Pendiente por verificar',
+    completado: 'Confirmado',
+  }[s] || s || '');
+
   // Export to CSV
   const exportToCSV = (data, filename) => {
     const headers = ['Nombre', 'Apellido', 'Cédula', 'Número', 'Correo', 'Celular', 'Liga', 'Categorías', 'Precio', 'Estado', 'Adjuntó comprobante', 'URL Comprobante', 'Fecha'];
@@ -167,7 +174,7 @@ export const AdminRegistrations = () => {
       reg.liga || '',
       (reg.categorias || []).join('; '),
       reg.precio_final || 0,
-      reg.estado_pago,
+      statusLabel(reg.estado_pago),
       reg.tiene_comprobante ? 'Sí' : 'No',
       reg.comprobante_url ? `${BACKEND_URL}${reg.comprobante_url}` : '',
       formatDate(reg.created_at)
@@ -268,9 +275,9 @@ export const AdminRegistrations = () => {
 
           {/* Stats */}
           <div className="bg-surface border border-white/10 p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
               <div>
-                <p className="text-white/70 text-sm mb-1">Total Inscripciones</p>
+                <p className="text-white/70 text-sm mb-1">Total</p>
                 <p className="font-heading text-3xl font-black text-primary">{registrations.length}</p>
               </div>
               <div>
@@ -278,13 +285,19 @@ export const AdminRegistrations = () => {
                 <p className="font-heading text-3xl font-black text-accent">{filteredRegistrations.length}</p>
               </div>
               <div>
-                <p className="text-white/70 text-sm mb-1">Pagos Pendientes</p>
-                <p className="font-heading text-3xl font-black text-warning">
+                <p className="text-white/70 text-sm mb-1">Pendientes</p>
+                <p className="font-heading text-3xl font-black" style={{ color: '#F97316' }}>
                   {registrations.filter((r) => r.estado_pago === 'pendiente').length}
                 </p>
               </div>
               <div>
-                <p className="text-white/70 text-sm mb-1">Pagos Completados</p>
+                <p className="text-white/70 text-sm mb-1">Por Verificar</p>
+                <p className="font-heading text-3xl font-black text-warning">
+                  {registrations.filter((r) => r.estado_pago === 'pendiente_verificacion').length}
+                </p>
+              </div>
+              <div>
+                <p className="text-white/70 text-sm mb-1">Confirmados</p>
                 <p className="font-heading text-3xl font-black text-secondary">
                   {registrations.filter((r) => r.estado_pago === 'completado').length}
                 </p>
@@ -319,7 +332,8 @@ export const AdminRegistrations = () => {
                 >
                   <option value="all">Todos los estados</option>
                   <option value="pendiente">Pendiente</option>
-                  <option value="completado">Completado</option>
+                  <option value="pendiente_verificacion">Pendiente por verificar</option>
+                  <option value="completado">Confirmado</option>
                 </select>
               </div>
             </div>
@@ -396,15 +410,22 @@ export const AdminRegistrations = () => {
                       COP {(reg.precio_final || 0).toLocaleString()}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <span
-                        className={`text-xs uppercase font-heading font-bold px-2 py-1 ${
-                          reg.estado_pago === 'completado'
-                            ? 'bg-secondary text-black'
-                            : 'bg-warning text-black'
-                        }`}
-                      >
-                        {reg.estado_pago}
-                      </span>
+                      {(() => {
+                        const map = {
+                          pendiente: { label: 'Pendiente', bg: '#F97316', fg: '#000' },
+                          pendiente_verificacion: { label: 'Por verificar', bg: '#EAB308', fg: '#000' },
+                          completado: { label: 'Confirmado', bg: '#10B981', fg: '#000' },
+                        };
+                        const s = map[reg.estado_pago] || { label: reg.estado_pago, bg: '#6B7280', fg: '#fff' };
+                        return (
+                          <span
+                            className="text-xs uppercase font-heading font-bold px-2 py-1 whitespace-nowrap"
+                            style={{ backgroundColor: s.bg, color: s.fg }}
+                          >
+                            {s.label}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {reg.tiene_comprobante && reg.comprobante_url ? (
@@ -429,22 +450,44 @@ export const AdminRegistrations = () => {
                       <div className="flex items-center justify-center space-x-2">
                         {updatingStatus === reg.id ? (
                           <RefreshCw className="w-4 h-4 animate-spin text-white/50" />
-                        ) : reg.estado_pago === 'pendiente' ? (
-                          <button
-                            onClick={() => handleUpdateStatus(reg.id, 'completado')}
-                            className="p-1 bg-secondary/20 text-secondary hover:bg-secondary/30 transition-colors"
-                            title="Marcar como completado"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </button>
                         ) : (
-                          <button
-                            onClick={() => handleUpdateStatus(reg.id, 'pendiente')}
-                            className="p-1 bg-warning/20 text-warning hover:bg-warning/30 transition-colors"
-                            title="Marcar como pendiente"
-                          >
-                            <XCircle className="w-4 h-4" />
-                          </button>
+                          <>
+                            {/* "Confirmar" — visible si NO está confirmado */}
+                            {reg.estado_pago !== 'completado' && (
+                              <button
+                                onClick={() => handleUpdateStatus(reg.id, 'completado')}
+                                className="p-1 bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+                                title="Confirmar pago (envía email al piloto)"
+                                data-testid={`btn-confirmar-${reg.id}`}
+                              >
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                            )}
+
+                            {/* "Marcar Por verificar" — visible si tiene comprobante y NO está ya en ese estado */}
+                            {reg.tiene_comprobante && reg.estado_pago !== 'pendiente_verificacion' && (
+                              <button
+                                onClick={() => handleUpdateStatus(reg.id, 'pendiente_verificacion')}
+                                className="p-1 bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30 transition-colors"
+                                title="Marcar como pendiente por verificar"
+                                data-testid={`btn-verificar-${reg.id}`}
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                              </button>
+                            )}
+
+                            {/* "Pendiente" — revertir */}
+                            {reg.estado_pago !== 'pendiente' && (
+                              <button
+                                onClick={() => handleUpdateStatus(reg.id, 'pendiente')}
+                                className="p-1 bg-orange-500/20 text-orange-400 hover:bg-orange-500/30 transition-colors"
+                                title="Marcar como pendiente"
+                                data-testid={`btn-pendiente-${reg.id}`}
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            )}
+                          </>
                         )}
                         {deletingId === reg.id ? (
                           <RefreshCw className="w-4 h-4 animate-spin text-red-500" />

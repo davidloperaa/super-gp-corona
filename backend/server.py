@@ -668,18 +668,13 @@ async def upload_comprobante(registration_id: str, file: UploadFile = File(...))
             "comprobante_url": comprobante_url,
             "comprobante_filename": file.filename,
             "tiene_comprobante": True,
-            "estado_pago": "completado"
+            "estado_pago": "pendiente_verificacion"
         }}
     )
     
-    # Send confirmation email now that payment is confirmed
-    try:
-        updated_reg = await db.registrations.find_one({"id": registration_id}, {"_id": 0})
-        if updated_reg:
-            email_html = generate_confirmation_email(updated_reg, updated_reg.get('qr_code'))
-            send_email(updated_reg["correo"], "Confirmación de Inscripción - Super GP Corona XP 2026", email_html, EMAIL_ADMIN)
-    except Exception as e:
-        logging.error(f"Error sending confirmation email after comprobante upload: {str(e)}")
+    # Note: confirmation email is sent only when an admin verifies the payment
+    # (i.e. updates status to "completado"). At this point we just mark the
+    # registration as "pendiente_verificacion".
     
     return {
         "message": "Comprobante cargado exitosamente",
@@ -804,7 +799,7 @@ async def verify_payment(registration_id: str):
 async def update_registration_status(registration_id: str, data: dict, payload: dict = Depends(verify_token)):
     """Manually update registration payment status (admin only)"""
     new_status = data.get("estado_pago")
-    if new_status not in ["pendiente", "completado"]:
+    if new_status not in ["pendiente", "pendiente_verificacion", "completado"]:
         raise HTTPException(status_code=400, detail="Estado no válido")
     
     reg = await db.registrations.find_one({"id": registration_id})
@@ -866,9 +861,9 @@ async def delete_all_registrations(payload: dict = Depends(verify_token)):
 
 @api_router.delete("/admin/registrations/status/{status}")
 async def delete_registrations_by_status(status: str, payload: dict = Depends(verify_token)):
-    """Delete registrations by payment status (pendiente or completado)"""
-    if status not in ["pendiente", "completado"]:
-        raise HTTPException(status_code=400, detail="Estado no válido. Use 'pendiente' o 'completado'")
+    """Delete registrations by payment status (pendiente, pendiente_verificacion, completado)"""
+    if status not in ["pendiente", "pendiente_verificacion", "completado"]:
+        raise HTTPException(status_code=400, detail="Estado no válido. Use 'pendiente', 'pendiente_verificacion' o 'completado'")
     
     result = await db.registrations.delete_many({"estado_pago": status})
     return {
