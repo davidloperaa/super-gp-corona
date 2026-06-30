@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 
 export const ConfirmacionPreinscripcion = () => {
   const whatsappCarlos = "https://wa.me/573104223288?text=Hola%20Carlos,%20acabo%20de%20realizar%20mi%20preinscripci%C3%B3n%20al%20Super%20GP%20Corona%20Club%20XP%20y%20adjunto%20mi%20comprobante%20de%20pago.";
-  const whatsappDavid = "https://wa.me/573103844519?text=Hola%20David,%20acabo%20de%20realizar%20mi%20preinscripci%C3%B3n%20al%20Super%20GP%20Corona%20Club%20XP%20y%20adjunto%20mi%20comprobante%20de%20pago.";
 
   return (
     <div className="min-h-screen pt-32 pb-24">
@@ -66,23 +65,18 @@ export const ConfirmacionPreinscripcion = () => {
           {/* WhatsApp Instructions */}
           <div className="bg-green-500/10 border border-green-500/30 p-6 mb-6">
             <p className="text-white/90 mb-4 font-bold">
-              Después de realizar el pago, envía el comprobante a:
+              ¿Necesitas contactarnos? Escríbenos por WhatsApp:
             </p>
-            <div className="space-y-3">
-              <p className="text-white/80">
-                <strong className="text-green-400">Carlos Alarcón:</strong> 3104223288
-              </p>
-              <p className="text-white/80">
-                <strong className="text-green-400">David Lopera:</strong> 3103844519 <span className="text-white/50 text-sm">(Verificaciones)</span>
-              </p>
-            </div>
+            <p className="text-white/80">
+              <strong className="text-green-400">Carlos Alarcón:</strong> 3104223288
+            </p>
             <p className="text-white/70 mt-4 text-sm">
               Tu inscripción quedará confirmada únicamente después de validar el pago.
             </p>
           </div>
 
-          {/* WhatsApp Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+          {/* WhatsApp Button */}
+          <div className="flex justify-center mb-6">
             <a
               href={whatsappCarlos}
               target="_blank"
@@ -92,16 +86,6 @@ export const ConfirmacionPreinscripcion = () => {
             >
               <MessageCircle className="w-5 h-5" />
               <span>WhatsApp Carlos</span>
-            </a>
-            <a
-              href={whatsappDavid}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center space-x-2 bg-green-600 text-white font-heading font-bold uppercase px-6 py-3 hover:bg-green-700 transition-colors"
-              data-testid="btn-whatsapp-david"
-            >
-              <MessageCircle className="w-5 h-5" />
-              <span>WhatsApp David</span>
             </a>
           </div>
 

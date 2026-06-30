@@ -177,11 +177,10 @@ export const Inscripcion = () => {
       return;
     }
 
-    // One-time warning: if no file attached and user hasn't attempted yet,
-    // show alert and require a second click to proceed without comprobante.
-    if (!comprobanteFile && !submitAttemptedWithoutFile) {
+    // El comprobante es OBLIGATORIO. Si no hay archivo adjunto, bloqueamos el envío.
+    if (!comprobanteFile) {
       setSubmitAttemptedWithoutFile(true);
-      alert('⚠️ No has adjuntado el comprobante de pago.\n\nSi ya pagaste, adjunta tu comprobante para confirmar tu cupo inmediatamente.\n\nSi aún no has pagado, puedes continuar y enviarnos el comprobante por WhatsApp más tarde. Para enviar la preinscripción sin comprobante, haz clic en "Enviar Preinscripción" una vez más.');
+      alert('⚠️ COMPROBANTE DE PAGO OBLIGATORIO\n\nPara completar tu inscripción es indispensable adjuntar el comprobante de pago.\n\nPor favor, sube tu comprobante (JPG, PNG o PDF) antes de enviar el formulario.');
       return;
     }
 
@@ -195,20 +194,18 @@ export const Inscripcion = () => {
 
       const registration = response.data;
 
-      // 2. If user attached a comprobante, upload it now
-      if (comprobanteFile) {
-        try {
-          const fileForm = new FormData();
-          fileForm.append('file', comprobanteFile);
-          await axios.post(
-            `${API}/registrations/${registration.id}/upload-comprobante`,
-            fileForm,
-            { headers: { 'Content-Type': 'multipart/form-data' } }
-          );
-        } catch (uploadErr) {
-          console.error('Error subiendo comprobante:', uploadErr);
-          alert('La preinscripción se creó correctamente, pero hubo un problema subiendo el comprobante. Podrás enviarlo por WhatsApp.');
-        }
+      // 2. Upload the comprobante (required)
+      try {
+        const fileForm = new FormData();
+        fileForm.append('file', comprobanteFile);
+        await axios.post(
+          `${API}/registrations/${registration.id}/upload-comprobante`,
+          fileForm,
+          { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+      } catch (uploadErr) {
+        console.error('Error subiendo comprobante:', uploadErr);
+        alert('La preinscripción se creó correctamente, pero hubo un problema subiendo el comprobante. Contacta al administrador por WhatsApp.');
       }
 
       // 3. Redirect to pre-registration confirmation page
@@ -571,17 +568,17 @@ export const Inscripcion = () => {
                   </div>
                 )}
 
-                {/* Comprobante de Pago (Opcional) — moved above Payment Info for visibility */}
+                {/* Comprobante de Pago (Obligatorio) — moved above Payment Info for visibility */}
                 <div className="bg-black/50 border border-secondary/40 p-6" data-testid="comprobante-section">
                   <h3 className="font-heading font-bold mb-2 flex items-center space-x-2">
                     <Upload className="w-5 h-5 text-secondary" />
-                    <span>Comprobante de Pago (Opcional)</span>
+                    <span>Comprobante de Pago (Obligatorio)</span>
                   </h3>
                   <p className="text-white/80 text-sm mb-3">
-                    <strong className="text-secondary">Recuerda</strong> que ahora puedes adjuntar tu comprobante de pago aquí mismo para <strong>confirmar tu cupo de inmediato</strong>.
+                    <strong className="text-red-400">Importante:</strong> debes adjuntar tu comprobante de pago para poder enviar la inscripción.
                   </p>
                   <p className="text-white/60 text-xs mb-4">
-                    Si lo adjuntas, tu inscripción quedará marcada como <strong className="text-green-400">CONFIRMADA</strong>. Si lo dejas vacío, podrás enviarlo después por WhatsApp.
+                    Una vez adjunto, tu inscripción quedará marcada como <strong className="text-yellow-400">PENDIENTE POR VERIFICAR</strong>. Cuando el administrador valide el pago, recibirás la confirmación oficial.
                   </p>
 
                   <label
@@ -630,9 +627,9 @@ export const Inscripcion = () => {
                   )}
 
                   {!comprobanteFile && submitAttemptedWithoutFile && (
-                    <p className="text-warning text-sm mt-3 flex items-start space-x-2" data-testid="comprobante-warning">
+                    <p className="text-red-400 text-sm mt-3 flex items-start space-x-2" data-testid="comprobante-warning">
                       <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>No has adjuntado el comprobante. Si haces clic de nuevo en "Enviar Preinscripción", continuaremos sin él y tu inscripción quedará pendiente de pago.</span>
+                      <span>Debes adjuntar el comprobante de pago. Sin este archivo no se puede completar la inscripción.</span>
                     </p>
                   )}
                 </div>
