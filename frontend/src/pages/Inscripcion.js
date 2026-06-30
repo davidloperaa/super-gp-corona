@@ -418,7 +418,17 @@ export const Inscripcion = () => {
               )}
 
               <div className="max-h-[60vh] overflow-y-auto pr-2 space-y-6">
-                {['VELOCIDAD TOP', 'VELOCIDAD', 'VELOCIDAD RECREATIVAS', 'KARTS', 'VELOTIERRA', 'MOTOCROSS', 'EVENTOS ESPECIALES'].map((groupName) => {
+                {(() => {
+                  // Preferred display order; any extra groups not in this list
+                  // are appended at the end so new admin groups still appear.
+                  const preferredOrder = ['VELOCIDAD TOP', 'VELOCIDAD', 'VELOCIDAD RECREATIVAS', 'KARTS', 'VELOTIERRA', 'MOTOCROSS', 'EVENTOS ESPECIALES'];
+                  const groupKeys = Object.keys(grupos || {});
+                  const ordered = [
+                    ...preferredOrder.filter(g => groupKeys.includes(g)),
+                    ...groupKeys.filter(g => !preferredOrder.includes(g)),
+                  ];
+                  return ordered;
+                })().map((groupName) => {
                   const groupCats = grupos[groupName] || [];
                   if (groupCats.length === 0) return null;
                   
@@ -431,10 +441,11 @@ export const Inscripcion = () => {
                     'MOTOCROSS': 'border-green-500 bg-green-500/20 text-green-500',
                     'EVENTOS ESPECIALES': 'border-purple-500 bg-purple-500/20 text-purple-500'
                   };
+                  const colorClass = groupColors[groupName] || 'border-white/30 bg-white/10 text-white';
                   
                   return (
                     <div key={groupName} className="mb-4">
-                      <div className={`${groupColors[groupName]} border-l-4 px-4 py-2 mb-3`}>
+                      <div className={`${colorClass} border-l-4 px-4 py-2 mb-3`}>
                         <h3 className="font-heading font-bold uppercase text-sm">{groupName}</h3>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
