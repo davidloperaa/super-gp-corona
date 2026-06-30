@@ -89,18 +89,32 @@ def main():
     H = {"Authorization": f"Bearer {r.json()['access_token']}"}
     print("[OK] Login admin")
 
-    # Bulk update
+    # Bulk update categorías
     r = requests.put(f"{API}/admin/categories-bulk", headers=H, json={
         "categorias": CATEGORIAS,
         "precios": PRECIOS,
         "grupos": GRUPOS,
     }, timeout=30)
     r.raise_for_status()
-    print(f"[OK] Categorías actualizadas: {r.json()}\n")
+    print(f"[OK] Categorías actualizadas: {r.json()}")
+
+    # Etapas de precios: reset a UNA sola etapa $100.000 (sin multiplicadores)
+    NEW_STAGES = [{
+        "etapa": "Inscripción única",
+        "precio": 100000,
+        "fecha": "Hasta el día del evento",
+        "color": "green",
+    }]
+    r = requests.put(f"{API}/admin/pricing-stages", headers=H, json={
+        "stages": NEW_STAGES,
+        "nota_devolucion": "Devoluciones con excusa según términos y condiciones del evento",
+    }, timeout=15)
+    r.raise_for_status()
+    print(f"[OK] Etapas de precios reseteadas a una sola de $100.000")
 
     # Verificación
     cats = requests.get(f"{API}/categories", timeout=15).json()
-    print(f"=== VERIFICACIÓN ===")
+    print(f"\n=== VERIFICACIÓN ===")
     print(f"Total: {len(cats['categorias'])} categorías\n")
     for grupo, lista in cats.get("grupos", {}).items():
         print(f"  [{grupo}] ({len(lista)})")
