@@ -11,12 +11,14 @@ export const AdminCategorias = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [prices, setPrices] = useState({});
+  const [groups, setGroups] = useState({});
+  const [categoryGroupMap, setCategoryGroupMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
-  const [editForm, setEditForm] = useState({ nombre: '', precio: 0 });
+  const [editForm, setEditForm] = useState({ nombre: '', precio: 0, grupo: '' });
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newCategory, setNewCategory] = useState({ nombre: '', precio: 120000 });
+  const [newCategory, setNewCategory] = useState({ nombre: '', precio: 100000, grupo: '' });
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -34,6 +36,8 @@ export const AdminCategorias = () => {
       });
       setCategories(response.data.categories || []);
       setPrices(response.data.prices || {});
+      setGroups(response.data.groups || {});
+      setCategoryGroupMap(response.data.category_group_map || {});
     } catch (error) {
       console.error('Error fetching categories:', error);
     } finally {
@@ -46,6 +50,10 @@ export const AdminCategorias = () => {
       alert('El nombre de la categoría es requerido');
       return;
     }
+    if (!newCategory.grupo) {
+      alert('Debes seleccionar un grupo para la categoría');
+      return;
+    }
 
     setSaving(true);
     const token = localStorage.getItem('admin_token');
@@ -56,9 +64,9 @@ export const AdminCategorias = () => {
         newCategory,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setCategories([...categories, newCategory.nombre]);
-      setPrices({ ...prices, [newCategory.nombre]: newCategory.precio });
-      setNewCategory({ nombre: '', precio: 120000 });
+      // Refetch to get the updated group assignments
+      await fetchCategories(token);
+      setNewCategory({ nombre: '', precio: 100000, grupo: '' });
       setShowAddForm(false);
       alert('Categoría creada exitosamente');
     } catch (error) {
@@ -73,18 +81,23 @@ export const AdminCategorias = () => {
     setEditingIndex(index);
     setEditForm({
       nombre: categoria,
-      precio: prices[categoria] || 120000
+      precio: prices[categoria] || 100000,
+      grupo: categoryGroupMap[categoria] || ''
     });
   };
 
   const handleCancelEdit = () => {
     setEditingIndex(null);
-    setEditForm({ nombre: '', precio: 0 });
+    setEditForm({ nombre: '', precio: 0, grupo: '' });
   };
 
   const handleSaveEdit = async () => {
     if (!editForm.nombre.trim()) {
       alert('El nombre de la categoría es requerido');
+      return;
+    }
+    if (!editForm.grupo) {
+      alert('Debes seleccionar un grupo para la categoría');
       return;
     }
 
@@ -98,21 +111,9 @@ export const AdminCategorias = () => {
         editForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      // Update local state
-      const newCategories = [...categories];
-      newCategories[editingIndex] = editForm.nombre;
-      setCategories(newCategories);
-      
-      const newPrices = { ...prices };
-      if (oldName !== editForm.nombre) {
-        delete newPrices[oldName];
-      }
-      newPrices[editForm.nombre] = editForm.precio;
-      setPrices(newPrices);
-      
+      await fetchCategories(token);
       setEditingIndex(null);
-      setEditForm({ nombre: '', precio: 0 });
+      setEditForm({ nombre: '', precio: 0, grupo: '' });
       alert('Categoría actualizada exitosamente');
     } catch (error) {
       alert(error.response?.data?.detail || 'Error al actualizar categoría');
@@ -197,7 +198,7 @@ export const AdminCategorias = () => {
         {showAddForm && (
           <div className="bg-surface border-2 border-secondary p-6 mb-8" data-testid="add-category-form">
             <h3 className="font-heading font-bold uppercase mb-4 text-secondary">Nueva Categoría</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="block text-white/60 text-sm mb-2">Nombre de la categoría</label>
                 <input
@@ -208,6 +209,20 @@ export const AdminCategorias = () => {
                   className="w-full bg-black/50 border border-white/20 focus:border-secondary text-white h-12 px-4 outline-none"
                   data-testid="input-new-category-name"
                 />
+              </div>
+              <div>
+                <label className="block text-white/60 text-sm mb-2">Grupo *</label>
+                <select
+                  value={newCategory.grupo}
+                  onChange={(e) => setNewCategory({ ...newCategory, grupo: e.target.value })}
+                  className="w-full bg-black/50 border border-white/20 focus:border-secondary text-white h-12 px-4 outline-none"
+                  data-testid="select-new-category-group"
+                >
+                  <option value="">-- Selecciona un grupo --</option>
+                  {Object.keys(groups).map((g) => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-white/60 text-sm mb-2">Precio (COP)</label>
@@ -233,7 +248,7 @@ export const AdminCategorias = () => {
               <button
                 onClick={() => {
                   setShowAddForm(false);
-                  setNewCategory({ nombre: '', precio: 120000 });
+                  setNewCategory({ nombre: '', precio: 100000, grupo: '' });
                 }}
                 className="flex items-center space-x-2 bg-white/10 text-white font-heading font-bold uppercase px-6 py-3 hover:bg-white/20 transition-colors"
                 data-testid="btn-cancel-new-category"
@@ -249,9 +264,10 @@ export const AdminCategorias = () => {
         <div className="bg-surface border border-white/10">
           <div className="grid grid-cols-12 gap-4 p-4 border-b border-white/10 font-heading font-bold uppercase text-sm text-white/60">
             <div className="col-span-1">#</div>
-            <div className="col-span-5">Categoría</div>
-            <div className="col-span-3">Precio</div>
-            <div className="col-span-3 text-right">Acciones</div>
+            <div className="col-span-4">Categoría</div>
+            <div className="col-span-3">Grupo</div>
+            <div className="col-span-2">Precio</div>
+            <div className="col-span-2 text-right">Acciones</div>
           </div>
 
           {categories.map((categoria, index) => (
@@ -263,7 +279,7 @@ export const AdminCategorias = () => {
               {editingIndex === index ? (
                 <>
                   <div className="col-span-1 text-white/40">{index + 1}</div>
-                  <div className="col-span-5">
+                  <div className="col-span-4">
                     <input
                       type="text"
                       value={editForm.nombre}
@@ -273,6 +289,19 @@ export const AdminCategorias = () => {
                     />
                   </div>
                   <div className="col-span-3">
+                    <select
+                      value={editForm.grupo}
+                      onChange={(e) => setEditForm({ ...editForm, grupo: e.target.value })}
+                      className="w-full bg-black/50 border border-secondary text-white h-10 px-3 outline-none"
+                      data-testid={`edit-group-${index}`}
+                    >
+                      <option value="">-- Sin grupo --</option>
+                      {Object.keys(groups).map((g) => (
+                        <option key={g} value={g}>{g}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="col-span-2">
                     <input
                       type="number"
                       value={editForm.precio}
@@ -281,7 +310,7 @@ export const AdminCategorias = () => {
                       data-testid={`edit-price-${index}`}
                     />
                   </div>
-                  <div className="col-span-3 flex justify-end space-x-2">
+                  <div className="col-span-2 flex justify-end space-x-2">
                     <button
                       onClick={handleSaveEdit}
                       disabled={saving}
@@ -304,11 +333,18 @@ export const AdminCategorias = () => {
               ) : (
                 <>
                   <div className="col-span-1 text-white/40">{index + 1}</div>
-                  <div className="col-span-5 font-medium">{categoria}</div>
-                  <div className="col-span-3 text-secondary font-bold">
-                    {formatPrice(prices[categoria] || 120000)}
+                  <div className="col-span-4 font-medium">{categoria}</div>
+                  <div className="col-span-3 text-xs uppercase font-heading">
+                    {categoryGroupMap[categoria] ? (
+                      <span className="bg-accent/20 text-accent px-2 py-1">{categoryGroupMap[categoria]}</span>
+                    ) : (
+                      <span className="text-white/40">Sin grupo</span>
+                    )}
                   </div>
-                  <div className="col-span-3 flex justify-end space-x-2">
+                  <div className="col-span-2 text-secondary font-bold">
+                    {formatPrice(prices[categoria] || 100000)}
+                  </div>
+                  <div className="col-span-2 flex justify-end space-x-2">
                     <button
                       onClick={() => handleStartEdit(index)}
                       disabled={saving || editingIndex !== null}
@@ -335,7 +371,7 @@ export const AdminCategorias = () => {
 
           {categories.length === 0 && (
             <div className="p-8 text-center text-white/40">
-              No hay categorías registradas. Haz clic en "Nueva Categoría" para agregar una.
+              No hay categorías registradas. Haz clic en &quot;Nueva Categoría&quot; para agregar una.
             </div>
           )}
         </div>

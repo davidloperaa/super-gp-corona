@@ -218,10 +218,12 @@ class CategoryPriceUpdate(BaseModel):
 class CategoryCreate(BaseModel):
     nombre: str
     precio: float
+    grupo: Optional[str] = None
 
 class CategoryUpdate(BaseModel):
     nombre: str
     precio: float
+    grupo: Optional[str] = None
 
 class ContentUpdate(BaseModel):
     key: str
@@ -1022,14 +1024,26 @@ async def get_admin_category_prices(payload: dict = Depends(verify_token)):
 
 @api_router.get("/admin/categories")
 async def get_admin_categories(payload: dict = Depends(verify_token)):
-    """Get all categories with their prices for admin"""
+    """Get all categories with their prices and groups for admin"""
     categories = await get_categories_from_db()
     prices = await get_category_prices()
-    return {"categories": categories, "prices": prices}
+    groups_doc = await db.category_groups.find_one({"_id": "groups"})
+    groups = (groups_doc or {}).get("groups") or {}
+    # Reverse index: category -> group
+    category_group_map = {}
+    for g_name, g_cats in groups.items():
+        for c in g_cats:
+            category_group_map[c] = g_name
+    return {
+        "categories": categories,
+        "prices": prices,
+        "groups": groups,
+        "category_group_map": category_group_map,
+    }
 
 @api_router.post("/admin/categories")
 async def create_category(category: CategoryCreate, payload: dict = Depends(verify_token)):
-    """Create a new category"""
+    """Create a new category (optionally assigned to a group)"""
     categories = await get_categories_from_db()
     
     if category.nombre in categories:
@@ -1046,7 +1060,21 @@ async def create_category(category: CategoryCreate, payload: dict = Depends(veri
     # Set the price
     await update_category_price(category.nombre, category.precio)
     
-    return {"message": "Categoría creada exitosamente", "categoria": category.nombre}
+    # Assign to group if provided
+    if category.grupo:
+        groups_doc = await db.category_groups.find_one({"_id": "groups"})
+        groups = (groups_doc or {}).get("groups") or {}
+        if category.grupo not in groups:
+            groups[category.grupo] = []
+        if category.nombre not in groups[category.grupo]:
+            groups[category.grupo].append(category.nombre)
+        await db.category_groups.update_one(
+            {"_id": "groups"},
+            {"$set": {"groups": groups}},
+            upsert=True
+        )
+    
+    return {"message": "Categoría creada exitosamente", "categoria": category.nombre, "grupo": category.grupo}
 
 @api_router.put("/admin/categories/{old_name}")
 async def update_category(old_name: str, category: CategoryUpdate, payload: dict = Depends(verify_token)):
@@ -1100,6 +1128,26 @@ async def update_category(old_name: str, category: CategoryUpdate, payload: dict
     else:
         # Just update price
         await update_category_price(category.nombre, category.precio)
+    
+    # Handle group change (if grupo provided, ensure category is in that group and no other)
+    if category.grupo is not None:
+        groups_doc = await db.category_groups.find_one({"_id": "groups"})
+        groups = (groups_doc or {}).get("groups") or {}
+        final_name = category.nombre
+        # Remove from any other group
+        for g_name, g_cats in list(groups.items()):
+            if final_name in g_cats and g_name != category.grupo:
+                g_cats.remove(final_name)
+        # Add to target group (create if doesn't exist)
+        if category.grupo not in groups:
+            groups[category.grupo] = []
+        if final_name not in groups[category.grupo]:
+            groups[category.grupo].append(final_name)
+        await db.category_groups.update_one(
+            {"_id": "groups"},
+            {"$set": {"groups": groups}},
+            upsert=True
+        )
     
     return {"message": "Categoría actualizada exitosamente", "categoria": category.nombre}
 
